@@ -824,3 +824,420 @@ int main() {
     }
     return 0;
 }
+
+
+//bộ phận liên thông
+#include <stdio.h>
+#define MAX_N 100
+typedef struct {
+    int data[MAX_N];
+    int size;
+} Stack;
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+void make_null_stack(Stack *stack) {
+    stack->size = 0;
+}
+void push(Stack *stack, int x) {
+    stack->data[stack->size] = x;
+    stack->size++;
+}
+int pop(Stack *stack) {
+    stack->size--;
+    return stack->data[stack->size];
+}
+void init_graph(Graph *pG, int n) {
+    pG->n = n;
+    pG->m = 0;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n; j++)
+            pG->A[i][j] = 0;
+}
+void add_edge(Graph *pG, int u, int v) {
+    pG->A[u][v] = 1;
+    pG->A[v][u] = 1;
+    pG->m++;
+}
+void read_graph(Graph *pG) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(pG, n);
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        add_edge(pG, u, v);
+    }
+}
+int mark[MAX_N];
+void init_mark(int n) {
+    for (int i = 1; i <= n; i++) {
+        mark[i] = 0;
+    }
+}
+int dfs(Graph *pG, int s) {
+    Stack S;
+    make_null_stack(&S);
+    push(&S, s);
+    int nodes_count = 0;
+    while (S.size > 0) {
+        int u = pop(&S);
+        if (!mark[u]) {
+            mark[u] = 1;
+            nodes_count++;
+            for (int v = pG->n; v >= 1; v--) {
+                if (pG->A[u][v] && !mark[v]) {
+                    push(&S, v);
+                }
+            }
+        }
+    }
+    return nodes_count;
+}
+int main() {
+    Graph G;
+    read_graph(&G);
+    init_mark(G.n);
+
+//đếm số bộ phận liên thông của đồ thị.
+int connected_comps = 0;
+    for (int i = 1; i <= G.n; i++){
+        if(!mark[i]){
+            dfs(&G, i);
+            connected_comps++;
+        }
+    }    
+    printf("%d", connected_comps);
+
+//đếm số đỉnh của bộ phận liên thông của đỉnh 1.
+    printf("%d", dfs(&G,1));
+
+//đếm số đỉnh của bộ phận liên thông của đỉnh s. Đỉnh s được đọc từ bàn phím.
+    int s;
+    scanf("%d", &s);
+    printf("%d", dfs(&G,s));
+
+//tìm bộ phận liên thông có nhiều đỉnh nhất.
+    int max = 0;
+    for(int i = 1; i <= G.n; i++){
+        int nodes = dfs(&G, i);
+        if (nodes > max)
+            max = nodes;
+    }
+    printf("%d", max);
+    return 0;
+}
+
+
+//CIRCLED
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_V 100
+typedef struct {
+    int n;
+    int m;
+    int matrix[MAX_V][MAX_V];
+} Graph;
+void initGraph(Graph *g, int n) {
+    g->n = n;
+    g->m = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            g->matrix[i][j] = 0;
+        }
+    }
+}
+void addEdge(Graph *g, int u, int v) {
+    g->matrix[u][v] = 1;
+}
+bool hasCycle(Graph *g, int u, bool visited[], bool recursionStack[]) {
+    if (!visited[u]) {
+        visited[u] = true;
+        recursionStack[u] = true;
+        for (int v = 0; v < g->n; v++) {
+            if (g->matrix[u][v]) {
+                if (!visited[v] && hasCycle(g, v, visited, recursionStack)) {
+                    return true;
+                } else if (recursionStack[v]) {
+                    return true;
+                }
+            }
+        }
+    }
+    recursionStack[u] = false;
+    return false;
+}
+bool detectCycle(Graph *g) {
+    bool visited[MAX_V] = {false};
+    bool recursionStack[MAX_V] = {false};
+    for (int i = 0; i < g->n; i++) {
+        if (!visited[i]) {
+            if (hasCycle(g, i, visited, recursionStack)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+int main() {
+    Graph g;
+    int n, m;
+    scanf("%d %d", &n, &m);
+    initGraph(&g, n);
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        addEdge(&g, u - 1, v - 1);
+    }
+    if (detectCycle(&g)) {
+        printf("CIRCLED\n");
+    } else {
+        printf("NO CIRCLE\n");
+    }
+    return 0;
+}
+
+//Chu trình hợp lệ
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_V 100
+typedef struct {
+    int n;
+    int m;
+    int matrix[MAX_V][MAX_V];
+} Graph;
+
+void initGraph(Graph *g, int n) {
+    g->n = n;
+    g->m = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            g->matrix[i][j] = 0;
+        }
+    }
+}
+
+void addEdge(Graph *g, int u, int v) {
+    g->matrix[u][v] = 1;
+}
+
+bool dfs(Graph *g, int u, bool visited[], bool recursionStack[], int parent[], int *cycleStart, int *cycleEnd) {
+    visited[u] = true;
+    recursionStack[u] = true;
+
+    for (int v = 0; v < g->n; v++) {
+        if (g->matrix[u][v]) {
+            if (!visited[v]) {
+                parent[v] = u;
+                if (dfs(g, v, visited, recursionStack, parent, cycleStart, cycleEnd)) {
+                    return true;
+                }
+            } else if (recursionStack[v]) {
+                *cycleStart = v;
+                *cycleEnd = u;
+                return true;
+            }
+        }
+    }
+
+    recursionStack[u] = false;
+    return false;
+}
+
+void findCycle(Graph *g) {
+    bool visited[MAX_V] = {false};
+    bool recursionStack[MAX_V] = {false};
+    int parent[MAX_V] = {-1};
+    int cycleStart = -1, cycleEnd = -1;
+
+    for (int i = 0; i < g->n; i++) {
+        if (!visited[i]) {
+            if (dfs(g, i, visited, recursionStack, parent, &cycleStart, &cycleEnd)) {
+                break;
+            }
+        }
+    }
+
+    if (cycleStart == -1) {
+        printf("-1\n");
+    } else {
+        int current = cycleEnd;
+        int cycle[MAX_V];
+        int cycleSize = 0;
+
+        cycle[cycleSize++] = cycleStart;
+        while (current != cycleStart) {
+            cycle[cycleSize++] = current;
+            current = parent[current];
+        }
+        cycle[cycleSize++] = cycleStart;
+
+        for (int i = cycleSize - 1; i >= 0; i--) {
+            printf("%d ", cycle[i] + 1);
+        }
+        printf("\n");
+    }
+}
+int main() {
+    Graph g;
+    int n, m;
+    scanf("%d %d", &n, &m);
+    initGraph(&g, n);
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        addEdge(&g, u - 1, v - 1);
+    }
+    findCycle(&g);
+    return 0;
+}
+
+//Moore 	
+#include <stdio.h>
+
+#define MAX_N 100
+#define NO_EDGE -1
+#define oo 1e9
+
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+
+void init_graph(Graph *G, int n){
+    G->n = n;
+    G->m =0;
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= n; j++){
+            G->A[i][j] = NO_EDGE;
+        }
+    }
+}
+
+void add_edge(Graph *G, int u, int v, int w){
+    G->A[u][v] = w;
+    G->m++;
+}
+
+void read_graph(Graph *G) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    for(int i = 0; i < m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }    
+}
+
+int mark[MAX_N], p[MAX_N], pi[MAX_N];
+
+void dijkstra(Graph *G, int u){
+    for(int i = 1; i <= G->n; i++){
+        mark[i] = 0;
+        pi[i] = oo;
+    }
+    pi[u] = 0;
+    p[u] = -1;
+    for (int i = 1; i <= G->n - 1; i++) {
+        for (int v = 1; v <= G->n; v++){
+            if (G->A[u][v] != NO_EDGE && !mark[v] && pi[u] + G->A[u][v] < pi[v]) {
+                pi[v] = pi[u] + G->A[u][v]; 
+                p[v] = u;
+            }
+        }
+        mark[u] = 1;
+        int min_pi = oo;        
+        for (int j = 1; j <= G->n; j++){
+            if (!mark[j] && pi[j] < min_pi) {
+                min_pi = pi[j];
+                u = j;
+            }
+        }        
+    }
+}
+
+int main(){
+    Graph G;
+    read_graph(&G);    
+    dijkstra(&G, 1);
+    for(int i = 1; i <= G.n; i++){
+        printf("pi[%d] = %d, p[%d] = %d\n", i, pi[i], i, p[i]);
+    }
+}
+
+// chiều dài đường đi ngắn nhất
+#include <stdio.h>
+
+#define MAX_N 100
+#define NO_EDGE -1
+#define oo 1e9
+
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+
+void init_graph(Graph *G, int n){
+    G->n = n;
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= n; j++){
+            G->A[i][j] = NO_EDGE;
+        }
+    }
+}
+
+void add_edge(Graph *G, int u, int v, int w){
+    G->A[u][v] = w;
+    G->m++;
+}
+
+void read_graph(Graph *G) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    for(int i = 0; i < m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }    
+}
+
+int mark[MAX_N], p[MAX_N], pi[MAX_N];
+
+void dijkstra(Graph *G, int u){
+    for(int i = 1; i <= G->n; i++){
+        mark[i] = 0;
+        pi[i] = oo;
+    }
+    pi[u] = 0;
+    p[u] = -1;
+    for (int i = 1; i <= G->n - 1; i++) {
+        for (int v = 1; v <= G->n; v++){
+            if (G->A[u][v] != NO_EDGE && !mark[v] && pi[u] + G->A[u][v] < pi[v]) {
+                pi[v] = pi[u] + G->A[u][v]; 
+                p[v] = u;
+            }
+        }
+        mark[u] = 1;
+        int min_pi = oo;        
+        for (int j = 1; j <= G->n; j++){
+            if (!mark[j] && pi[j] < min_pi) {
+                min_pi = pi[j];
+                u = j;
+            }
+        }        
+    }
+}
+
+int main(){
+    Graph G;
+    read_graph(&G);    
+    dijkstra(&G, 1);
+    if(pi[G.n] != oo) printf("%d", pi[G.n]); 
+    else printf("-1");
+}
+
+
+
