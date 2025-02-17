@@ -1241,3 +1241,393 @@ int main(){
 
 
 
+//đường đi ngắn nhất từ đỉnh s đến đỉnh t
+#include <stdio.h>
+#define MAX_N 100
+#define NO_EDGE -1
+#define oo 1e9
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+void init_graph(Graph *G, int n){
+    G->n = n;
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= n; j++){
+            G->A[i][j] = NO_EDGE;
+        }
+    }
+}
+void add_edge(Graph *G, int u, int v, int w){
+    G->A[u][v] = w;
+    G->A[v][u] = w; 
+    G->m++;
+}
+void read_graph(Graph *G) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    for(int i = 0; i < m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }
+}
+int mark[MAX_N], p[MAX_N], pi[MAX_N];
+void dijkstra(Graph *G, int u){    
+    for(int i = 1; i <= G->n; i++){
+        mark[i] = 0;
+        pi[i] = oo;
+    }
+    pi[u] = 0;
+    p[u] = -1;
+    for (int i = 1; i <= G->n - 1; i++) {
+        for (int v = 1; v <= G->n; v++){
+            if (G->A[u][v] != NO_EDGE && !mark[v] && pi[u] + G->A[u][v] < pi[v]) {
+                pi[v] = pi[u] + G->A[u][v]; 
+                p[v] = u;
+            }
+        }
+        mark[u] = 1;
+        int min_pi = oo;        
+        for (int j = 1; j <= G->n; j++){
+            if (!mark[j] && pi[j] < min_pi) {
+                min_pi = pi[j];
+                u = j;
+            }
+        }        
+    }
+}
+void print_path(int s, int t){
+    int i = 0, path[MAX_N];
+    while(t != s){
+        path[i++] = t;        
+        t = p[t];
+    }
+    path[i] = s;
+    for(int j = i; j > 0; j--){
+        printf("%d -> ", path[j]);
+    }
+    printf("%d", path[0]);
+}
+int main(){
+    Graph G;
+    read_graph(&G);
+    int s, t;
+    scanf("%d %d", &s, &t);
+    dijkstra(&G, s);
+    print_path(s, t);
+}
+
+
+
+//Mê cung số (number maze)
+#include <stdio.h>
+#define MAX_N 100
+#define NO_EDGE -1
+#define oo 1e9
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+void init_graph (Graph *G, int n){
+    G->n = n;
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= n; j++){
+            G->A[i][j] = NO_EDGE;
+        }
+    }
+}
+void add_edge(Graph *G, int u, int v, int w){
+    G->A[u][v] = w;
+    G->m++;
+}
+int is_valid(int i, int j, int n, int m){
+    return (0 <= i && i < n && j >= 0 && j < m);
+}
+void read_graph(Graph *G){
+    int n, m, w;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n*m);
+    int adj[][4]={{-1, 1,  0, 0},
+                  { 0, 0, -1, 1}};
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            scanf("%d", &w);
+            for(int k = 0; k < 4; k++){
+                int adjR = i + adj[0][k];
+                int adjC = j + adj[1][k];                
+                if(is_valid(adjR, adjC, n, m)){                    
+                    add_edge(G, adjR*m+adjC+1, i*m+j+1, w);
+                }                
+            }
+        }
+    }
+}
+int mark[MAX_N], pi[MAX_N], p[MAX_N];
+
+void dijkstra(Graph *G, int u){    
+    for(int i = 1; i <= G->n; i++){
+        mark[i] = 0;
+        pi[i] = oo;
+    }
+    pi[u] = 0;
+    p[u] = -1;
+    for (int i = 1; i <= G->n - 1; i++) {
+        for(int v = 1; v <= G->n; v++){
+            if (G->A[u][v] != NO_EDGE && !mark[v] && pi[u] + G->A[u][v] < pi[v]) {
+                pi[v] = pi[u] + G->A[u][v]; 
+                p[v] = u;
+            }
+        }
+        mark[u] = 1;
+        int min_pi = oo;        
+        for (int j = 1; j <= G->n; j++){
+            if (!mark[j] && pi[j] < min_pi) {
+                min_pi = pi[j];
+                u = j;
+            }
+        }        
+    }
+}  
+int main(){
+    Graph G;
+    read_graph(&G);
+    dijkstra(&G, 1);
+    printf("%d", pi[G.n]);
+}
+
+
+
+
+
+// đơn đồ thị có hướng, có trọng số (có thể âm)
+#include <stdio.h>
+#define MAX_N 100
+#define MAX_M 500
+#define NO_EDGE -1
+#define oo 1e9
+typedef struct {
+    int u, v, w;
+} Edge;
+typedef struct {
+    int n, m;
+    Edge edges[MAX_M];
+} Graph;
+void init_graph(Graph *G, int n){
+    G->n = n;
+    G->m = 0;
+}
+void add_edge(Graph *G, int u, int v, int w){
+    G->edges[G->m].u = u;
+    G->edges[G->m].v = v;
+    G->edges[G->m].w = w;
+    G->m++;
+}
+void read_graph(Graph *G) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    for(int i = 0; i < m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }    
+}
+int mark[MAX_N], p[MAX_N], pi[MAX_N];
+void bellman_ford(Graph *G, int s){
+    for(int i = 1; i <= G->n; i++){
+        mark[i] = 0;
+        pi[i] = oo;
+    }
+    pi[s] = 0;
+    p[s] = -1;
+    for (int i = 1; i <= G->n - 1; i++) {
+        for (int j = 0; j < G->m; j++){
+            Edge e = G->edges[j];
+            if(pi[e.u] != oo && pi[e.u] + e.w < pi[e.v]){
+                pi[e.v] = pi[e.u] + e.w;
+                p[e.v] = e.u;
+            }
+        }
+    }
+}
+void print_length(Graph *G){
+    bellman_ford(G, 1);
+    pi[G->n] != oo ? printf("%d", pi[G->n]) : printf("-1");
+}
+
+void print_path(Graph *G){
+    int s, t;
+    scanf("%d %d", &s, &t);
+    bellman_ford(G, s);
+    int i = 0, path[MAX_N];
+    while(t != s){
+        path[i++] = t;        
+        t = p[t];
+    }
+    path[i] = s;
+    for(int j = i; j > 0; j--){
+        printf("%d -> ", path[j]);
+    }
+    printf("%d", path[0]);
+}
+int main(){
+    Graph G;
+    read_graph(&G);   
+    print_length(&G);
+print_path(&G);
+}
+
+
+
+
+
+
+
+#include <stdio.h>
+
+#define MAX_N 100
+#define MAX_M 500
+#define NO_EDGE -1
+#define oo 1e9
+
+typedef struct {
+    int u, v, w;
+} Edge;
+
+typedef struct {
+    int n, m;
+    Edge edges[MAX_M];
+} Graph;
+
+void init_graph(Graph *G, int n){
+    G->n = n;
+    G->m = 0;
+}
+
+void add_edge(Graph *G, int u, int v, int w){
+    G->edges[G->m].u = u;
+    G->edges[G->m].v = v;
+    G->edges[G->m].w = w;
+    G->m++;
+}
+void read_graph(Graph *G) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    for(int i = 0; i < m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }    
+}
+int mark[MAX_N], p[MAX_N], pi[MAX_N];
+int bellman_ford(Graph *G, int s){
+    for(int i = 1; i <= G->n; i++){
+        mark[i] = 0;
+        pi[i] = oo;
+    }
+    pi[s] = 0;
+    p[s] = -1;
+    for (int i = 1; i <= G->n - 1; i++) {
+        for (int j = 0; j < G->m; j++){
+            Edge e = G->edges[j];
+            if(pi[e.u] != oo && pi[e.u] + e.w < pi[e.v]){
+                pi[e.v] = pi[e.u] + e.w;
+                p[e.v] = e.u;
+            }
+        }
+    }
+    for (int j = 0; j < G->m; j++){
+        Edge e = G->edges[j];
+        if(pi[e.u] != oo && pi[e.u] + e.w < pi[e.v]){
+            return 1;
+        }
+    }
+    return 0;
+}
+int main(){
+    Graph G;
+    read_graph(&G);
+    int s;
+    scanf("%d", &s);
+    bellman_ford(&G, s) ? printf("YES") : printf("NO");
+}
+
+
+
+//Extended traffic 
+#include <stdio.h>
+
+#define MAX_N 100
+#define MAX_M 500
+#define NO_EDGE -1
+#define oo 1e9
+
+typedef struct {
+    int u, v, w;
+} Edge;
+
+typedef struct {
+    int n, m;
+    Edge edges[MAX_M];
+} Graph;
+
+void init_graph(Graph *G, int n){
+    G->n = n;
+    G->m = 0;
+}
+
+void add_edge(Graph *G, int u, int v, int w){
+    G->edges[G->m].u = u;
+    G->edges[G->m].v = v;
+    G->edges[G->m].w = w;
+    G->m++;
+}
+
+void read_graph(Graph *G) {
+    int n, m, b[MAX_N];
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);    
+    for(int i = 1; i <= n; i++){
+        scanf("%d", &b[i]);
+    }
+    for(int i = 0; i < m; i++){
+        int u, v;
+        scanf("%d %d", &u, &v);
+        int w = (b[v] - b[u]);
+        w *= w*w;
+        add_edge(G, u, v, w);
+    }    
+}
+
+int mark[MAX_N], p[MAX_N], pi[MAX_N];
+
+void bellman_ford(Graph *G, int s){
+    for(int i = 1; i <= G->n; i++){
+        mark[i] = 0;
+        pi[i] = oo;
+    }
+    pi[s] = 0;
+    p[s] = -1;
+    for (int i = 1; i <= G->n - 1; i++) {
+        for (int j = 0; j < G->m; j++){
+            Edge e = G->edges[j];
+            if(pi[e.u] != oo && pi[e.u] + e.w < pi[e.v]){
+                pi[e.v] = pi[e.u] + e.w;
+                p[e.v] = e.u;
+            }
+        }
+    }
+}
+
+int main(){
+    Graph G;
+    read_graph(&G);
+    int s, t;
+    scanf("%d %d", &s, &t);
+    bellman_ford(&G, 1);
+    if (pi[t]!=oo) printf("%d", pi[t]); else printf("?");
+
+}
