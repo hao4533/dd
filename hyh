@@ -1,0 +1,100 @@
+#include <stdio.h>
+
+#define MAX_N 100
+#define NO_EDGE 0
+#define oo 1000000000  // Large value instead of 1e9 for integer operations
+
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+
+void init_graph(Graph *G, int n) {
+    G->n = n;
+    G->m = 0;
+    for (int u = 1; u <= n; u++) {
+        for (int v = 1; v <= n; v++) {
+            G->A[u][v] = NO_EDGE;
+        }
+    }
+}
+
+void add_edge(Graph *G, int u, int v, int w) {
+    G->A[u][v] = w;
+    G->A[v][u] = w;
+    G->m++;
+}
+
+void read_graph(Graph *G) {
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    
+    for (int i = 0; i < m; i++) {  // Fix loop condition
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }
+}
+
+int pi[MAX_N], p[MAX_N], mark[MAX_N];
+
+int prim(Graph *G, Graph *T, int start) {
+    for (int i = 1; i <= G->n; i++) {
+        pi[i] = oo;
+        p[i] = -1;
+        mark[i] = 0;
+    }
+    pi[start] = 0;
+    init_graph(T, G->n);
+    
+    int sum_w = 0;
+    for (int i = 0; i < G->n; i++) {
+        int u = -1, min_pi = oo;
+
+        for (int j = 1; j <= G->n; j++) {
+            if (!mark[j] && pi[j] < min_pi) {
+                min_pi = pi[j];
+                u = j;
+            }
+        }
+
+        if (u == -1) break; // No more vertices to process
+
+        mark[u] = 1;
+        sum_w += pi[u];
+
+        if (p[u] != -1) {
+            add_edge(T, u, p[u], G->A[u][p[u]]);
+        }
+
+        for (int v = 1; v <= G->n; v++) {
+            if (G->A[u][v] != NO_EDGE && !mark[v] && pi[v] > G->A[u][v]) {
+                pi[v] = G->A[u][v];
+                p[v] = u;
+            }
+        }
+    }
+    return sum_w;
+}
+
+int delete_edge(Graph *G, Graph *T) {
+    int total_weight = 0;
+
+    for (int u = 1; u <= G->n; u++) {  // Fix loop range
+        for (int v = u + 1; v <= G->n; v++) { // Avoid double counting edges
+            if (G->A[u][v] != NO_EDGE)
+                total_weight += G->A[u][v];
+        }
+    }
+
+    int mst_weight = prim(G, T, 1);
+    return total_weight - mst_weight;
+}
+
+int main() {
+    Graph G, T;
+    read_graph(&G);
+    printf("%d\n", delete_edge(&G, &T));
+    return 0;
+}
