@@ -1712,3 +1712,262 @@ int main(){
     read_graph(&G);
     floyd_warshall(&G) ? printf("YES") : printf("NO");
 }
+
+
+//Viết chương trình đọc đồ thị vô hướng liên thông và tìm cây khung có trọng số nhỏ nhất bằng thuật toán Kruskal.
+#include <stdio.h>
+#define MAX_N 100
+typedef struct {
+    int u, v, w;
+} Edge;
+typedef struct {
+    int n, m;
+    Edge E[MAX_N];
+} Graph;
+void init_graph(Graph *G, int n){
+    G->n = n;
+    G->m = 0;
+}
+void add_edge(Graph *G, int u, int v, int w){
+    Edge e = {u,v,w};
+    G->E[G->m] = e;
+    G->m++;
+}
+void read_graph(Graph *G){
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    for(int i = 0; i <= m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }
+}
+int parent[MAX_N];
+int find_root(int u) {
+    while (parent[u] != u)
+        u = parent[u];
+    return u;
+}
+
+void sort(Edge e[], int m){
+  for(int i = 0; i < m; i++){
+      for(int j = i+1; j < m; j++){
+          if(e[i].w > e[j].w){
+              Edge x = e[i];
+              e[i] = e[j];
+              e[j] = x;
+          }
+      }
+  }
+}
+int kruskal(Graph *G, Graph *T){
+    sort(G->E, G->m);
+    init_graph(T, G->n);
+    for(int u = 1; u <= G->n; u++){
+        parent[u] = u;
+    }
+    int sum_w = 0;
+    for(int i = 0; i < G->m; i++){
+        Edge e = G->E[i];
+        int r_u = find_root(e.u);
+        int r_v = find_root(e.v);
+        if(r_u != r_v){
+            if(e.u < e.v){
+                add_edge(T, e.u, e.v, e.w);
+                parent[r_v] = r_u;
+            } else {
+                add_edge(T, e.v, e.u, e.w);
+                parent[r_u] = r_v;
+            }
+            sum_w += e.w;
+        }
+    }
+    sort(T->E, T->m);
+    return sum_w;
+}
+int main(){
+    Graph G, T;
+    read_graph(&G);
+    printf("%d\n", kruskal(&G, &T));  
+    for(int i = 0; i < T.m; i++){
+        Edge e = T.E[i];
+        printf("%d %d %d\n", e.u, e.v, e.w);
+    }
+}
+
+
+//Viết chương trình đọc một đồ thị vô hướng liên thông và tìm cây khung có trọng số nhỏ nhất bằng thuật toán Prim.
+#include <stdio.h>
+
+#define MAX_N 100
+#define NO_EDGE 0
+#define oo 1e9
+
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+
+void init_graph(Graph *G, int n){
+    G->n = n;
+    for(int u = 1; u <= n; u++){
+        for(int v = 1; v <= n; v++){
+            G->A[u][v] = NO_EDGE;
+        }
+    }
+}
+
+void add_edge(Graph *G, int u, int v, int w){
+    G->A[u][v] = w;
+    G->A[v][u] = w;
+    G->m++;
+}
+
+void read_graph(Graph *G){
+    int n, m;
+    scanf("%d %d", &n, &m);
+    init_graph(G, n);
+    for(int i = 0; i <= m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }
+}
+
+int pi[MAX_N], p[MAX_N], mark[MAX_N];
+
+int prim(Graph *G, Graph *T, int u){
+    for(int i = 1; i <= G->n; i++){
+        pi[i] = oo;
+        p[i] = -1;
+        mark[i] = 0;
+    }
+    pi[u] = 0;
+    for(int i = 0; i < G->n-1; i++){        
+        for(int v = 1; v <= G->n; v++){            
+            if(G->A[u][v] != NO_EDGE && mark[v] == 0 && G->A[u][v] < pi[v]){
+                pi[v] = G->A[u][v];
+                p[v] = u;
+            }
+        }
+        mark[u] = 1;
+        printf("%d\n", u);
+        int min_pi = oo;        
+        for (int j = 1; j <= G->n; j++){
+            if (!mark[j] && pi[j] < min_pi) {
+                min_pi = pi[j];
+                u = j;
+            }                
+        }
+    }
+    printf("%d\n", u);
+    int sum_w = 0;
+    init_graph(T, G->n);
+    for(int u = 1; u <= G->n; u++){
+        if (p[u] != -1){
+            add_edge(T, p[u], u, G->A[p[u]][u]);
+            sum_w += G->A[p[u]][u];
+        }
+    }
+    return sum_w;
+}
+
+int delete_edge(Graph *G, Graph *T) {
+    int sum = 0;
+
+    for (int u = 1; u <= G->n; u++) { 
+        for (int v = u + 1; v <= G->n; v++) {
+            if (G->A[u][v] != NO_EDGE)
+                sum += G->A[u][v];
+        }
+    }
+    int sum_prim = prim(G, T, 1);
+    return sum - sum_prim;
+}
+int main(){
+    Graph G, T;
+    read_graph(&G);
+    prim(&G, &T, 1);
+}
+
+//Ngưu Lang
+#include <stdio.h>
+#define MAX_N 100
+#define NO_EDGE 0
+#define oo 1e9
+typedef struct {
+    int n, m;
+    int A[MAX_N][MAX_N];
+} Graph;
+void init_graph(Graph *G, int n){
+    G->n = n;
+    for(int u = 1; u <= n; u++){
+        for(int v = 1; v <= n; v++){
+            G->A[u][v] = NO_EDGE;
+        }
+    }
+}
+void add_edge(Graph *G, int u, int v, int w){
+    G->A[u][v] = w;
+    G->A[v][u] = w;
+    G->m++;
+}
+void read_graph(Graph *G, int *k){
+    int n, m;
+    scanf("%d %d %d", &n, &m, k);
+    init_graph(G, n);
+    for(int i = 0; i <= m; i++){
+        int u, v, w;
+        scanf("%d %d %d", &u, &v, &w);
+        add_edge(G, u, v, w);
+    }
+//Hoàng là thợ điện
+    for( i = 0; i <= m; i++){
+        int u, v, s, d;
+        scanf("%d %d %d %d", &u, &v, &s, &d);
+        add_edge(G, u, v, s*d);
+    }
+}
+
+int pi[MAX_N], p[MAX_N], mark[MAX_N];
+int prim(Graph *G, Graph *T, int u){
+    for(int i = 1; i <= G->n; i++){
+        pi[i] = oo;
+        p[i] = -1;
+        mark[i] = 0;
+    }
+    pi[u] = 0;
+    for(int i = 0; i < G->n-1; i++){        
+        for(int v = 1; v <= G->n; v++){            
+            if(G->A[u][v] != NO_EDGE && mark[v] == 0 && G->A[u][v] < pi[v]){
+                pi[v] = G->A[u][v];
+                p[v] = u;
+            }
+        }
+        mark[u] = 1;
+        int min_pi = oo;        
+        for (int j = 1; j <= G->n; j++){
+            if (!mark[j] && pi[j] < min_pi) {
+                min_pi = pi[j];
+                u = j;
+            }                
+        }
+    }
+    int sum_w = 0;
+    init_graph(T, G->n);
+    for(int u = 1; u <= G->n; u++){
+        if (p[u] != -1){
+            add_edge(T, p[u], u, G->A[p[u]][u]);
+            sum_w += G->A[p[u]][u];
+        }
+    }
+    return sum_w;
+}
+int main(){
+    Graph G, T;
+    int k;
+    read_graph(&G, &k);
+    k = prim(&G, &T, 1) - k;
+    k == 0 ? printf("OK") : printf("%d", k);
+}
