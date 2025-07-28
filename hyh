@@ -92,3 +92,24 @@ void heap_sort(record a[], int n){
 	}
 	swap(&a[0], &a[1]);
 }
+
+void solve(item *a, int n, int p_val, int m, int x[], int i, float *final_res){
+	for(int j = m/a[i].w; j >= 0; j--){
+		float cur_val, remain, ubound;
+		cur_val= p_val + j*a[i].v;
+		remain = m - j*a[i].w;
+		ubound = cur_val + remain*a[i+1].ppu;
+		if(ubound > *final_res){
+			x[i] = j;			
+			if((i == n-1 || remain == 0) && cur_val > *final_res){
+				*final_res = cur_val;
+				for(int k = 0; k < n; k++){
+					a[k].qty = x[k];
+				}		
+			}
+			else
+				solve(a, n, cur_val, remain, x, i+1, final_res);
+		}		
+		x[i] = 0;	
+	}
+}
