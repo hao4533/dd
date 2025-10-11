@@ -13,3 +13,4 @@ echo 'export NETKIT_HOME=~/KatharaMMT/bin' >> ~/.bashrc
 echo 'export PATH=$PATH:$NETKIT_HOME' >> ~/.bashrc
 echo 'export MANPATH=:$NETKIT_HOME/man' >> ~/.bashrc
 source ~/.bashrc
+https://github.com/KatharaFramework/Kathara/releases
