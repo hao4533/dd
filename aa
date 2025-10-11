@@ -14,3 +14,4 @@ echo 'export PATH=$PATH:$NETKIT_HOME' >> ~/.bashrc
 echo 'export MANPATH=:$NETKIT_HOME/man' >> ~/.bashrc
 source ~/.bashrc
 https://github.com/KatharaFramework/Kathara/releases
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21805A48E6CBBA6B991ABE766461938628759810
