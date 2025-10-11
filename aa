@@ -15,3 +15,17 @@ echo 'export MANPATH=:$NETKIT_HOME/man' >> ~/.bashrc
 source ~/.bashrc
 https://github.com/KatharaFramework/Kathara/releases
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21805A48E6CBBA6B991ABE766461938628759810
+Trên cửa sổ Terminal gõ lệnh sau để cài đặt tiện ích giả lập thiết bị đầu cuối
+sudo apt install xterm
+• Trên cửa sổ Terminal gõ lệnh sau để thêm Kathara public key vào hệ điều hành Ubuntu
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 
+• Trên cửa sổ Terminal gõ các lệnh sau để cài đặt Kathara:
+sudo add-apt-repository ppa:katharaframework/kathara
+sudo apt update
+sudo apt install kathara
+Bước 5: Bổ sung phần vạch đường (routing) cho ảnh Kathara 
+• Mở cửa sổ lệnh, gõ lệnh 
+sudo docker pull kathara/quagga
+Bước 6: Kiểm thử Kathara
+• Tạo một máy tính có một card mạng tên eth0 theo chuẩn ethernet và kết nối vào 
+nhánh mạng A, trên cửa sổ Terminal gõ lệnh kathara vstart -n pc1 --eth 0:A
