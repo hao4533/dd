@@ -5,3 +5,9 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io
 sudo usermod -aG docker $USER
+cd KatharaMMT
+sudo ./install.sh
+echo 'export NETKIT_HOME=~/KatharaMMT/bin' >> ~/.bashrc
+echo 'export PATH=$PATH:$NETKIT_HOME' >> ~/.bashrc
+echo 'export MANPATH=:$NETKIT_HOME/man' >> ~/.bashrc
+source ~/.bashrc
