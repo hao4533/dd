@@ -1,31 +1,17 @@
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y apt-transport-https ca-certificates curl software-properties-common python3 python3-pip git build-essential xterm
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io
-sudo usermod -aG docker $USER
-git clone https://github.com/KatharaFramework/Kathara.git
-mv Kathara KatharaMMT
-cd KatharaMMT
-sudo ./install.sh
-echo 'export NETKIT_HOME=~/KatharaMMT/bin' >> ~/.bashrc
-echo 'export PATH=$PATH:$NETKIT_HOME' >> ~/.bashrc
-echo 'export MANPATH=:$NETKIT_HOME/man' >> ~/.bashrc
-source ~/.bashrc
-https://github.com/KatharaFramework/Kathara/releases
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 21805A48E6CBBA6B991ABE766461938628759810
-Trên cửa sổ Terminal gõ lệnh sau để cài đặt tiện ích giả lập thiết bị đầu cuối
-sudo apt install xterm
-• Trên cửa sổ Terminal gõ lệnh sau để thêm Kathara public key vào hệ điều hành Ubuntu
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 
-• Trên cửa sổ Terminal gõ các lệnh sau để cài đặt Kathara:
-sudo add-apt-repository ppa:katharaframework/kathara
-sudo apt update
-sudo apt install kathara
-Bước 5: Bổ sung phần vạch đường (routing) cho ảnh Kathara 
-• Mở cửa sổ lệnh, gõ lệnh 
-sudo docker pull kathara/quagga
-Bước 6: Kiểm thử Kathara
-• Tạo một máy tính có một card mạng tên eth0 theo chuẩn ethernet và kết nối vào 
-nhánh mạng A, trên cửa sổ Terminal gõ lệnh kathara vstart -n pc1 --eth 0:A
+cp -r /home/student/your_workspace/BaiTap3 /home/student/your_workspace/BaiTap4
+cd /home/student/your_workspace/BaiTap4
+mkdir pc3 pc4
+touch pc3.startup pc4.startup
+
+pc1[0]=A
+pc3[0]=A
+router[0]=A
+pc2[0]=B
+pc4[0]=B
+router[1]=B
+
+ifconfig eth0 10.0.0.102/24 up
+route add default gw 10.0.0.1
+
+ifconfig eth0 10.0.1.102/24 up
+route add default gw 10.0.1.1
