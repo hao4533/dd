@@ -1,17 +1,60 @@
-cp -r /home/student/your_workspace/BaiTap3 /home/student/your_workspace/BaiTap4
-cd /home/student/your_workspace/BaiTap4
-mkdir pc3 pc4
-touch pc3.startup pc4.startup
+# Tạo thư mục bài tập
+mkdir -p BaiTap7 && cd BaiTap7
 
+# Tạo file lab.conf
+cat << 'EOF' > lab.conf
 pc1[0]=A
-pc3[0]=A
-router[0]=A
-pc2[0]=B
-pc4[0]=B
-router[1]=B
+router1[0]=A
+router1[1]=B
+router2[0]=B
+router2[1]=C
+router3[0]=C
+router3[1]=D
+pc2[0]=C
+pc3[0]=D
+EOF
 
-ifconfig eth0 10.0.0.102/24 up
+# File pc1.startup
+cat << 'EOF' > pc1.startup
+ifconfig eth0 10.0.0.2/24 up
 route add default gw 10.0.0.1
+EOF
 
-ifconfig eth0 10.0.1.102/24 up
-route add default gw 10.0.1.1
+# File pc2.startup
+cat << 'EOF' > pc2.startup
+ifconfig eth0 10.0.2.2/24 up
+route add default gw 10.0.2.1
+EOF
+
+# File pc3.startup
+cat << 'EOF' > pc3.startup
+ifconfig eth0 10.0.3.2/24 up
+route add default gw 10.0.3.1
+EOF
+
+# File router1.startup
+cat << 'EOF' > router1.startup
+ifconfig eth0 10.0.0.1/24 up
+ifconfig eth1 10.0.1.1/24 up
+route add -net 10.0.2.0/24 gw 10.0.1.2
+route add -net 10.0.3.0/24 gw 10.0.1.2
+EOF
+
+# File router2.startup
+cat << 'EOF' > router2.startup
+ifconfig eth0 10.0.1.2/24 up
+ifconfig eth1 10.0.2.1/24 up
+route add -net 10.0.0.0/24 gw 10.0.1.1
+route add -net 10.0.3.0/24 gw 10.0.2.2
+EOF
+
+# File router3.startup
+cat << 'EOF' > router3.startup
+ifconfig eth0 10.0.2.2/24 up
+ifconfig eth1 10.0.3.1/24 up
+route add -net 10.0.0.0/24 gw 10.0.2.1
+route add -net 10.0.1.0/24 gw 10.0.2.1
+EOF
+
+# Hiển thị xác nhận
+echo "✅ Hoàn tất tạo cấu hình Bài tập 7. Dùng lstart để khởi động mạng."
