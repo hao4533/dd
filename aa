@@ -3,60 +3,73 @@ mkdir -p BaiTap7 && cd BaiTap7
 mkdir pc1 pc2 pc3 router1 router2 router3
 touch lab.conf pc1.startup pc2.startup pc3.startup router1.startup router2.startup router3.startup
 
-# Tạo file lab.conf
+mkdir -p BaiTap7 && cd BaiTap7
+
+# File lab.conf
 cat << 'EOF' > lab.conf
 pc1[0]=A
 router1[0]=A
 router1[1]=B
+router1[2]=D
 router2[0]=B
 router2[1]=C
-router3[0]=C
-router3[1]=D
+router2[2]=E
+router3[0]=D
+router3[1]=E
+router3[2]=F
 pc2[0]=C
-pc3[0]=D
+pc3[0]=F
 EOF
 
-# File pc1.startup
+# PC1
 cat << 'EOF' > pc1.startup
-ifconfig eth0 10.0.0.2/24 up
-route add default gw 10.0.0.1
+ifconfig eth0 192.168.0.40/27 up
+route add default gw 192.168.0.33
 EOF
 
-# File pc2.startup
+# PC2
 cat << 'EOF' > pc2.startup
-ifconfig eth0 10.0.2.2/24 up
-route add default gw 10.0.2.1
+ifconfig eth0 192.168.0.100/27 up
+route add default gw 192.168.0.97
 EOF
 
-# File pc3.startup
+# PC3
 cat << 'EOF' > pc3.startup
-ifconfig eth0 10.0.3.2/24 up
-route add default gw 10.0.3.1
+ifconfig eth0 192.168.0.200/27 up
+route add default gw 192.168.0.193
 EOF
 
-# File router1.startup
+# Router1
 cat << 'EOF' > router1.startup
-ifconfig eth0 10.0.0.1/24 up
-ifconfig eth1 10.0.1.1/24 up
-route add -net 10.0.2.0/24 gw 10.0.1.2
-route add -net 10.0.3.0/24 gw 10.0.1.2
+ifconfig eth0 192.168.0.33/27 up
+ifconfig eth1 192.168.0.65/27 up
+ifconfig eth2 192.168.0.129/27 up
+route add -net 192.168.0.96/27 gw 192.168.0.66
+route add -net 192.168.0.160/27 gw 192.168.0.66
+route add -net 192.168.0.192/27 gw 192.168.0.130
 EOF
 
-# File router2.startup
+# Router2
 cat << 'EOF' > router2.startup
-ifconfig eth0 10.0.1.2/24 up
-ifconfig eth1 10.0.2.1/24 up
-route add -net 10.0.0.0/24 gw 10.0.1.1
-route add -net 10.0.3.0/24 gw 10.0.2.2
+ifconfig eth0 192.168.0.66/27 up
+ifconfig eth1 192.168.0.97/27 up
+ifconfig eth2 192.168.0.161/27 up
+route add -net 192.168.0.32/27 gw 192.168.0.65
+route add -net 192.168.0.128/27 gw 192.168.0.162
+route add -net 192.168.0.192/27 gw 192.168.0.162
 EOF
 
-# File router3.startup
+# Router3
 cat << 'EOF' > router3.startup
-ifconfig eth0 10.0.2.2/24 up
-ifconfig eth1 10.0.3.1/24 up
-route add -net 10.0.0.0/24 gw 10.0.2.1
-route add -net 10.0.1.0/24 gw 10.0.2.1
+ifconfig eth0 192.168.0.130/27 up
+ifconfig eth1 192.168.0.162/27 up
+ifconfig eth2 192.168.0.193/27 up
+route add -net 192.168.0.32/27 gw 192.168.0.129
+route add -net 192.168.0.64/27 gw 192.168.0.161
+route add -net 192.168.0.96/27 gw 192.168.0.161
 EOF
+
+echo "✅ Hoàn tất tạo cấu hình Bài tập 7. Dùng lstart để khởi động mạng."
 
 # Hiển thị xác nhận
 echo "✅ Hoàn tất tạo cấu hình Bài tập 7. Dùng lstart để khởi động mạng."
