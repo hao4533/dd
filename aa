@@ -1,5 +1,7 @@
 # Tạo thư mục bài tập
 mkdir -p BaiTap7 && cd BaiTap7
+mkdir pc1 pc2 pc3 router1 router2 router3
+touch lab.conf pc1.startup pc2.startup pc3.startup router1.startup router2.startup router3.startup
 
 # Tạo file lab.conf
 cat << 'EOF' > lab.conf
