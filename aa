@@ -1,22 +1,28 @@
-# Tạo thư mục bài tập
-cd /home/student/your_workspace
-mkdir BaiTap8
-cd BaiTap8
-
-# Tạo thư mục cho các máy ảo
-mkdir pc1 pc2 pc3 pc4 switch
-
-# Tạo các file cấu hình
-touch lab.conf
-touch pc1.startup pc2.startup pc3.startup pc4.startup switch.startup
+cd ~/workspace
+mkdir BaiTap9
+cd BaiTap9
+touch lab.conf pc1.startup pc2.startup pc3.startup pc4.startup pc5.startup pc6.startup pc7.startup pc8.startup switch1.startup switch2.startup
+# Các nhánh A, B, C, D nối vào SWITCH1
 pc1[0]=A
 pc2[0]=B
 pc3[0]=C
 pc4[0]=D
-switch[0]=A
-switch[1]=B
-switch[2]=C
-switch[3]=D
+switch1[0]=A
+switch1[1]=B
+switch1[2]=C
+switch1[3]=D
+switch1[4]=K
+
+# Các nhánh E, F, G, H nối vào SWITCH2
+pc5[0]=E
+pc6[0]=F
+pc7[0]=G
+pc8[0]=H
+switch2[0]=E
+switch2[1]=F
+switch2[2]=G
+switch2[3]=H
+switch2[4]=K
 
 ifconfig eth0 10.0.0.10/24 up
 ifconfig eth0 hw ether 00:00:00:00:00:10
@@ -30,21 +36,33 @@ ifconfig eth0 hw ether 00:00:00:00:00:30
 ifconfig eth0 10.0.0.40/24 up
 ifconfig eth0 hw ether 00:00:00:00:00:40
 
-# Đặt MAC cho các giao diện của switch (tùy chọn)
-ifconfig eth0 up
-ifconfig eth0 hw ether 00:00:00:00:10:10
-ifconfig eth1 up
-ifconfig eth1 hw ether 00:00:00:00:20:20
-ifconfig eth2 up
-ifconfig eth2 hw ether 00:00:00:00:30:30
-ifconfig eth3 up
-ifconfig eth3 hw ether 00:00:00:00:40:40
+ifconfig eth0 10.0.0.11/24 up
+ifconfig eth0 hw ether 77:70:00:00:00:10
 
-# Tạo và cấu hình Bridge
-brctl addbr br0       # Tạo cầu nối br0
-brctl addif br0 eth0  # Thêm cổng eth0 vào br0
-brctl addif br0 eth1  # Thêm cổng eth1 vào br0
-brctl addif br0 eth2  # Thêm cổng eth2 vào br0
-brctl addif br0 eth3  # Thêm cổng eth3 vào br0
-brctl stp br0 on      # Bật Spanning Tree Protocol (STP)
-ifconfig br0 up       # Kích hoạt cầu nối
+ifconfig eth0 10.0.0.22/24 up
+ifconfig eth0 hw ether 77:70:00:00:00:20
+
+ifconfig eth0 10.0.0.33/24 up
+ifconfig eth0 hw ether 77:70:00:00:00:30
+
+ifconfig eth0 10.0.0.44/24 up
+ifconfig eth0 hw ether 77:70:00:00:00:40
+
+brctl addbr br0
+brctl addif br0 eth0
+brctl addif br0 eth1
+brctl addif br0 eth2
+brctl addif br0 eth3
+brctl addif br0 eth4
+brctl stp br0 on
+ifconfig br0 up
+
+
+brctl addbr br0
+brctl addif br0 eth0
+brctl addif br0 eth1
+brctl addif br0 eth2
+brctl addif br0 eth3
+brctl addif br0 eth4
+brctl stp br0 on
+ifconfig br0 up
