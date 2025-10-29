@@ -1,18 +1,11 @@
 # BaiTap10 - Kết nối hai mạng LAN qua Router
 
-NODE_TYPE[router]=router
-NODE_TYPE[pc1]=lxc
-NODE_TYPE[pc2]=lxc
-NODE_TYPE[pc3]=lxc
-NODE_TYPE[pc4]=lxc
-NODE_TYPE[switch1]=lxc 
-NODE_TYPE[switch2]=lxc 
-LINK[router-switch1]=router:eth0,switch1:eth2
-LINK[switch1-pc1]=switch1:eth0,pc1:eth0
-LINK[switch1-pc2]=switch1:eth1,pc2:eth0
-LINK[router-switch2]=router:eth1,switch2:eth2
-LINK[switch2-pc3]=switch2:eth0,pc3:eth0
-LINK[switch2-pc4]=switch2:eth1,pc4:eth0
+pc1[eth0]=switch1[eth0]
+pc2[eth0]=switch1[eth1]
+switch1[eth2]=router[eth0]
+pc3[eth0]=switch2[eth0]
+pc4[eth0]=switch2[eth1]
+switch2[eth2]=router[eth1]
 
 ip a add 192.168.10.11/24 dev eth0
 ip r add default via 192.168.10.254
