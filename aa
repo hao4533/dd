@@ -1,84 +1,33 @@
-cd ~/workspace
-mkdir BaiTap9
-cd BaiTap9
-touch lab.conf pc1.startup pc2.startup pc3.startup pc4.startup pc5.startup pc6.startup pc7.startup pc8.startup switch1.startup switch2.startup
-# Các nhánh A, B, C, D nối vào SWITCH1
-pc1[0]=A
-pc2[0]=B
-pc3[0]=C
-pc4[0]=D
-switch1[0]=A
-switch1[1]=B
-switch1[2]=C
-switch1[3]=D
-switch1[4]=K
+# BaiTap10 - Kết nối hai mạng LAN bằng Router
 
-# Các nhánh E, F, G, H nối vào SWITCH2
-pc5[0]=E
-pc6[0]=F
-pc7[0]=G
-pc8[0]=H
-switch2[0]=E
-switch2[1]=F
-switch2[2]=G
-switch2[3]=H
-switch2[4]=K
+pc1[eth0]=switch1
+pc2[eth0]=switch1
+switch1[eth2]=router[eth0]
 
-ifconfig eth0 10.0.0.10/24 up
-ifconfig eth0 hw ether 00:00:00:00:00:10
+pc3[eth0]=switch2
+pc4[eth0]=switch2
+switch2[eth2]=router[eth1]
 
-ifconfig eth0 10.0.0.20/24 up
-ifconfig eth0 hw ether 00:00:00:00:00:20
+ifconfig eth0 192.168.10.11/24 up
+ip route add default via 192.168.10.1
 
-ifconfig eth0 10.0.0.30/24 up
-ifconfig eth0 hw ether 00:00:00:00:00:30
+ifconfig eth0 192.168.10.12/24 up
+ip route add default via 192.168.10.1
 
-ifconfig eth0 10.0.0.40/24 up
-ifconfig eth0 hw ether 00:00:00:00:00:40
+ifconfig eth0 192.168.11.13/24 up
+ip route add default via 192.168.11.1
 
-ifconfig eth0 10.0.0.11/24 up
-ifconfig eth0 hw ether 77:70:00:00:00:10
-
-ifconfig eth0 10.0.0.22/24 up
-ifconfig eth0 hw ether 77:70:00:00:00:20
-
-ifconfig eth0 10.0.0.33/24 up
-ifconfig eth0 hw ether 77:70:00:00:00:30
-
-ifconfig eth0 10.0.0.44/24 up
-ifconfig eth0 hw ether 77:70:00:00:00:40
+ifconfig eth0 192.168.11.14/24 up
+ip route add default via 192.168.11.1
 
 brctl addbr br0
-brctl addif br0 eth0
-brctl addif br0 eth1
-brctl addif br0 eth2
-brctl addif br0 eth3
-brctl addif br0 eth4
-brctl stp br0 on
+brctl addif br0 eth0 eth1 eth2
 ifconfig br0 up
 
-ifconfig eth0 up
-ifconfig eth0 hw ether 00:00:00:00:10:10
-ifconfig eth1 up
-ifconfig eth1 hw ether 00:00:00:00:20:20
-ifconfig eth2 up
-ifconfig eth2 hw ether 00:00:00:00:30:30
-ifconfig eth3 up
-ifconfig eth3 hw ether 00:00:00:00:40:40
-ifconfig eth4 up
-ifconfig eth4 hw ether 00:00:00:00:50:50
 brctl addbr br0
-brctl addif br0 eth1
-brctl addif br0 eth2
-brctl addif br0 eth3
-brctl addif br0 eth4
-brctl stp br0 on
-
-brctl addbr br0
-brctl addif br0 eth0
-brctl addif br0 eth1
-brctl addif br0 eth2
-brctl addif br0 eth3
-brctl addif br0 eth4
-brctl stp br0 on
+brctl addif br0 eth0 eth1 eth2
 ifconfig br0 up
+
+ifconfig eth0 192.168.10.1/24 up
+ifconfig eth1 192.168.11.1/24 up
+
