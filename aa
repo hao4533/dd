@@ -1,16 +1,21 @@
+# BaiTap10 - Ket noi hai mang LAN qua Router
+
 router[router]=router
-pc1[pc1]=lxc
-pc2[pc2]=lxc
-pc3[pc3]=lxc
-pc4[pc4]=lxc
-switch1[switch1]=lxc
-switch2[switch2]=lxc
+lxc[pc1]=pc1
+lxc[pc2]=pc2
+lxc[pc3]=pc3
+lxc[pc4]=pc4
+lxc[switch1]=switch1
+lxc[switch2]=switch2
+
 link[router-switch1]=router:eth0,switch1:eth2
 link[switch1-pc1]=switch1:eth0,pc1:eth0
 link[switch1-pc2]=switch1:eth1,pc2:eth0
+
 link[router-switch2]=router:eth1,switch2:eth2
 link[switch2-pc3]=switch2:eth0,pc3:eth0
 link[switch2-pc4]=switch2:eth1,pc4:eth0
+
 
 ip addr add 192.168.10.11/24 dev eth0
 ip route add default via 192.168.10.254
