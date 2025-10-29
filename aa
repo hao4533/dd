@@ -7,6 +7,10 @@ pc3[eth0]=switch2[eth0]
 pc4[eth0]=switch2[eth1]
 switch2[eth2]=router[eth1]
 
+brctl addbr br0
+brctl addif br0 eth0 eth1 eth2
+ifconfig br0 up
+
 ip a add 192.168.10.11/24 dev eth0
 ip r add default via 192.168.10.254
 
