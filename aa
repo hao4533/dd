@@ -1,45 +1,24 @@
-# ============================
-# MẠNG SỬ DỤNG RIPv2 (bên trái)
-# ============================
-# LAN A – 132.134.192.0/27
-A[0]=a
 A[1]=rcusc
-# LAN B – 132.133.18.0/27
-B[0]=b
 B[1]=rcusc
 B[2]=rctu
-# LAN C – 132.132.18.0/27
-C[0]=c
 C[1]=rctu
 C[2]=rcit
-# LAN server – 192.168.192.0/24
+
 S[0]=rcit
 S[1]=webserver
 S[2]=sw1
-# ============================
-# MẠNG SỬ DỤNG OSPFv2 (bên phải)
-# ============================
-# LAN D – 155.56.158.192/27
-D[0]=d
+
 D[1]=rctu
-# LAN E – 155.57.121.128/27
-E[0]=e
 E[1]=rsarg
 E[2]=rsofl
-# LAN F – 155.57.192.0/27 (KHÔNG CÓ node f)
 F[0]=rsarg
 F[1]=rsofl
-# LAN PC – 192.200.200.0/24
+
 PC[0]=rsofl
 PC[1]=pc1
 PC[2]=pc2
 PC[3]=sw2
-# ============================
-# LIÊN KẾT GIỮA CÁC ROUTER
-# ============================
-# liên kết giữa rcusc ↔ rctu
+
 rcusc[2]=rctu[2]
-# liên kết giữa rctu ↔ rsofl
 rctu[3]=rsofl[3]
-# liên kết giữa rsofl ↔ rsarg
 rsofl[1]=rsarg[1]
