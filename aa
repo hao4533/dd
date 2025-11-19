@@ -1,38 +1,45 @@
-# BaiTap10 - Ket noi hai mang LAN qua Router
-
-router[router]=router
-lxc[pc1]=pc1
-lxc[pc2]=pc2
-lxc[pc3]=pc3
-lxc[pc4]=pc4
-lxc[switch1]=switch1
-lxc[switch2]=switch2
-
-link[router-switch1]=router:eth0,switch1:eth2
-link[switch1-pc1]=switch1:eth0,pc1:eth0
-link[switch1-pc2]=switch1:eth1,pc2:eth0
-
-link[router-switch2]=router:eth1,switch2:eth2
-link[switch2-pc3]=switch2:eth0,pc3:eth0
-link[switch2-pc4]=switch2:eth1,pc4:eth0
-
-
-ip addr add 192.168.10.11/24 dev eth0
-ip route add default via 192.168.10.254
-
-ip addr add 192.168.10.12/24 dev eth0
-ip route add default via 192.168.10.254
-
-ip addr add 192.168.11.13/24 dev eth0
-ip route add default via 192.168.11.254
-
-ip addr add 192.168.11.14/24 dev eth0
-ip route add default via 192.168.11.254
-
-brctl addbr br0
-brctl addif br0 eth0 eth1 eth2
-ifconfig br0 up
-
-ip addr add 192.168.10.254/24 dev eth0
-ip addr add 192.168.11.254/24 dev eth1
-sysctl -w net.ipv4.ip_forward=1
+# ============================
+# MẠNG SỬ DỤNG RIPv2 (bên trái)
+# ============================
+# LAN A – 132.134.192.0/27
+A[0]=a
+A[1]=rcusc
+# LAN B – 132.133.18.0/27
+B[0]=b
+B[1]=rcusc
+B[2]=rctu
+# LAN C – 132.132.18.0/27
+C[0]=c
+C[1]=rctu
+C[2]=rcit
+# LAN server – 192.168.192.0/24
+S[0]=rcit
+S[1]=webserver
+S[2]=sw1
+# ============================
+# MẠNG SỬ DỤNG OSPFv2 (bên phải)
+# ============================
+# LAN D – 155.56.158.192/27
+D[0]=d
+D[1]=rctu
+# LAN E – 155.57.121.128/27
+E[0]=e
+E[1]=rsarg
+E[2]=rsofl
+# LAN F – 155.57.192.0/27 (KHÔNG CÓ node f)
+F[0]=rsarg
+F[1]=rsofl
+# LAN PC – 192.200.200.0/24
+PC[0]=rsofl
+PC[1]=pc1
+PC[2]=pc2
+PC[3]=sw2
+# ============================
+# LIÊN KẾT GIỮA CÁC ROUTER
+# ============================
+# liên kết giữa rcusc ↔ rctu
+rcusc[2]=rctu[2]
+# liên kết giữa rctu ↔ rsofl
+rctu[3]=rsofl[3]
+# liên kết giữa rsofl ↔ rsarg
+rsofl[1]=rsarg[1]
