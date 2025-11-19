@@ -2,7 +2,7 @@ hostname zebra
 password zebra
 enable password zebra
 log file /var/log/zebra/zebra.log
-
+echo "rsofl OSPF configuration completed"
 zebra=yes
 ospfd=yes
 ripd=no
