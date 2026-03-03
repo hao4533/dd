@@ -1,14 +1,19 @@
-sudo apt update
-sudo apt install nagios-nrpe-server nagios-plugins -y
+sudo nano /usr/local/nagios/etc/servers/remote_host.cfg
 
-sudo nano /etc/nagios/nrpe.cfg
+define service {
+    use                     generic-service
+    host_name               ubuntu_server
+    service_description     CPU Load
+    check_command           check_nrpe!check_cpu
+}
 
-command[check_cpu]=/usr/lib/nagios/plugins/check_load -w 2,1.5,1 -c 4,3,2
+define service {
+    use                     generic-service
+    host_name               ubuntu_server
+    service_description     RAM Usage
+    check_command           check_nrpe!check_ram
+}
 
-command[check_ram]=/usr/lib/nagios/plugins/check_mem -w 80 -c 90
+sudo /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 
-sudo apt install nagios-plugins-contrib -y
-
-sudo systemctl restart nagios-nrpe-server
-
-sudo systemctl status nagios-nrpe-server
+sudo systemctl restart nagios
