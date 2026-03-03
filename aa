@@ -1,1 +1,5 @@
 /usr/local/nagios/libexec/check_nrpe -H 192.168.1.30
+
+sudo find / -name check_nrpe 2>/dev/null
+
+/usr/lib/nagios/plugins/check_nrpe -H 192.168.1.30
