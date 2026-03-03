@@ -16,3 +16,5 @@ sudo apt install nagios-plugins nagios-plugins-contrib -y
 
 
 sudo systemctl restart nagios-nrpe-server
+sudo systemctl unmask nagios-nrpe-server
+sudo systemctl enable nagios-nrpe-server
