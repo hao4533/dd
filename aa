@@ -1,8 +1,2 @@
-<html>
-    <head>
-        <title>Thong tin sinh vien</title>
-    </head>
-    <body>
-        <h1>Chao ban, toi ten [HoTenSV], [MSSV]</h1>
-    </body>
-</html>
+sudo apt update
+sudo apt install nagios-nrpe-server nagios-plugins -y
