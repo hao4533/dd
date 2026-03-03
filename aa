@@ -10,3 +10,6 @@ sudo find / -name check_nrpe 2>/dev/null
 
 
 sudo nano /etc/nagios/nrpe.cfg
+
+
+sudo apt install nagios-plugins nagios-plugins-contrib -y
