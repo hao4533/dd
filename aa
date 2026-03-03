@@ -7,3 +7,6 @@ sudo find / -name check_nrpe 2>/dev/null
 /usr/lib/nagios/plugins/check_nrpe -H 192.168.1.30 -c check_cpu
 
 /usr/lib/nagios/plugins/check_nrpe -H 192.168.1.30 -c check_ram
+
+
+sudo nano /etc/nagios/nrpe.cfg
