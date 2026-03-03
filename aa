@@ -1,2 +1,14 @@
 sudo apt update
 sudo apt install nagios-nrpe-server nagios-plugins -y
+
+sudo nano /etc/nagios/nrpe.cfg
+
+command[check_cpu]=/usr/lib/nagios/plugins/check_load -w 2,1.5,1 -c 4,3,2
+
+command[check_ram]=/usr/lib/nagios/plugins/check_mem -w 80 -c 90
+
+sudo apt install nagios-plugins-contrib -y
+
+sudo systemctl restart nagios-nrpe-server
+
+sudo systemctl status nagios-nrpe-server
