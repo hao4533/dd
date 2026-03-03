@@ -15,3 +15,8 @@ command[check_ram]=/usr/lib/nagios/plugins/check_mem -w 80 -c 90
 
 sudo pkill nrpe
 sudo /usr/local/nagios/bin/nrpe -c /usr/local/nagios/etc/nrpe.cfg -d
+
+define command {
+    command_name    check_nrpe
+    command_line    /usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}
