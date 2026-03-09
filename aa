@@ -1,22 +1,6 @@
-/usr/local/nagios/libexec/check_nrpe -H 192.168.1.30
+cd /usr/local/nagios/libexec
+sudo wget https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
+sudo mv check_mem.pl check_mem
+sudo chmod +x check_mem
 
-sudo find / -name check_nrpe 2>/dev/null
-
-/usr/lib/nagios/plugins/check_nrpe -H 192.168.1.30
-
-/usr/lib/nagios/plugins/check_nrpe -H 192.168.1.30 -c check_cpu
-
-/usr/lib/nagios/plugins/check_nrpe -H 192.168.1.30 -c check_ram
-
-
-sudo nano /etc/nagios/nrpe.cfg
-command[check_cpu]=/usr/lib/nagios/plugins/check_load -w 2,1.5,1 -c 4,3,2
-command[check_ram]=/usr/lib/nagios/plugins/check_mem -w 80 -c 90
-
-sudo pkill nrpe
-sudo /usr/local/nagios/bin/nrpe -c /usr/local/nagios/etc/nrpe.cfg -d
-
-define command {
-    command_name    check_nrpe
-    command_line    /usr/lib/nagios/plugins/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
-}
+command[check_mem]=/usr/local/nagios/libexec/check_mem -f -w 80 -c 90
