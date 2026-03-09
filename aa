@@ -9,3 +9,5 @@ sudo pkill nrpe
 sudo /usr/local/nagios/bin/nrpe -c /usr/local/nagios/etc/nrpe.cfg -d
 
 /usr/lib/nagios/plugins/check_nrpe -H 172.16.98.100 -c check_mem
+
+/usr/local/nagios/libexec/check_nrpe -H 172.16.98.234
