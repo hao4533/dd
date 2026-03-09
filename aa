@@ -4,3 +4,8 @@ sudo mv check_mem.pl check_mem
 sudo chmod +x check_mem
 
 command[check_mem]=/usr/local/nagios/libexec/check_mem -f -w 80 -c 90
+
+sudo pkill nrpe
+sudo /usr/local/nagios/bin/nrpe -c /usr/local/nagios/etc/nrpe.cfg -d
+
+/usr/lib/nagios/plugins/check_nrpe -H 172.16.98.100 -c check_mem
