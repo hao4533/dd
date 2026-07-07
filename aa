@@ -1,13 +1,32 @@
-cd /usr/local/nagios/libexec
-sudo wget https://raw.githubusercontent.com/justintime/nagios-plugins/master/check_mem/check_mem.pl
-sudo mv check_mem.pl check_mem
-sudo chmod +x check_mem
+<?php
+// THAY ĐỔI CÁC THÔNG TIN DƯỚI ĐÂY CHO ĐÚNG VỚI MÁY DATABASE
+$server_name = "IP_DONG_CUA_MAY_DATABASE"; 
+$username = "Hao_B2305569";
+$password = "MatKhauCuaUserDatabase";
+$database = "Hao_B2305569_database";
 
-command[check_mem]=/usr/local/nagios/libexec/check_mem -f -w 80 -c 90
+// Tạo kết nối
+$conn = new mysqli($server_name, $username, $password, $database);
 
-sudo pkill nrpe
-sudo /usr/local/nagios/bin/nrpe -c /usr/local/nagios/etc/nrpe.cfg -d
+// Kiểm tra kết nối
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error);
+}
+echo "<h1>Kết nối thành công tới Database Server trên OpenStack!</h1>";
 
-/usr/lib/nagios/plugins/check_nrpe -H 172.16.98.100 -c check_mem
+// Truy vấn dữ liệu từ bảng todo_list đã tạo ở phần trước
+$sql = "SELECT item_id, content FROM todo_list";
+$result = $conn->query($sql);
 
-/usr/local/nagios/libexec/check_nrpe -H 172.16.98.234
+if ($result->num_index > 0 || $result->num_rows > 0) {
+    echo "<h3>Danh sách công việc (Todo List):</h3><ul>";
+    while($row = $result->fetch_assoc()) {
+        echo "<li>" . $row["item_id"] . ". " . $row["content"] . "</li>";
+    }
+    echo "</ul>";
+} else {
+    echo "Không có dữ liệu trong bảng.";
+}
+
+$conn->close();
+?>
