@@ -24,3 +24,25 @@ docker start datanode2
 hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes"
 hdfs dfsadmin -report | grep -i "under replicated"
 hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Live_repl|Status|Under-replicated|Average block replication"
+
+
+cat /data/retail_transactions.csv /data/retail_transactions.csv /data/retail_transactions.csv \
+  | head -c 1073741824 > /tmp/test_1gb.dat
+ls -lh /tmp/test_1gb.dat
+hdfs dfs -mkdir -p /user/student/lab01/bs64 /user/student/lab01/bs128
+
+for i in 1 2 3; do
+  hdfs dfs -rm -f -skipTrash /user/student/lab01/bs64/test_1gb.dat > /dev/null
+  echo "== 64 MB, lan $i"
+  time hdfs dfs -D dfs.blocksize=67108864 -put /tmp/test_1gb.dat /user/student/lab01/bs64/test_1gb.dat
+
+  hdfs dfs -rm -f -skipTrash /user/student/lab01/bs128/test_1gb.dat > /dev/null
+  echo "== 128 MB, lan $i"
+  time hdfs dfs -D dfs.blocksize=134217728 -put /tmp/test_1gb.dat /user/student/lab01/bs128/test_1gb.dat
+done
+
+for d in bs64 bs128; do
+  hdfs fsck /user/student/lab01/$d/test_1gb.dat -blocks 2>/dev/null | grep "Total blocks"
+  hdfs dfs -stat "%n blocksize=%o" /user/student/lab01/$d/test_1gb.dat
+done
+hdfs dfs -du -h /user/student/lab01
