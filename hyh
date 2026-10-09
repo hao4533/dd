@@ -1,3 +1,7 @@
+for p in 9870 9864 9865 8088 8042 8043 8080 18080 19888; do
+  printf "%-6s %s\n" $p $(curl -s -o /dev/null -w "%{http_code}" -L http://localhost:$p/)
+done
+
 ls -lh /data
 hdfs dfs -mkdir -p /user/student/lab01
 hdfs dfs -put /data/retail_transactions.csv /user/student/lab01/
