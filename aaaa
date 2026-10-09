@@ -1,0 +1,26 @@
+hdfs dfs -stat "replication=%r blocksize=%o size=%b" /user/student/lab01/retail_transactions.csv
+hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations
+
+hdfs dfs -setrep 3 /user/student/lab01/retail_transactions.csv
+hdfs dfs -ls /user/student/lab01/retail_transactions.csv
+hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Target Replicas|Live_repl|Status|Under-replicated|Missing replicas"
+hdfs dfsadmin -report | grep -i "under replicated"
+
+hdfs dfs -setrep -w 2 /user/student/lab01/retail_transactions.csv
+hdfs dfsadmin -report | grep -i "under replicated"
+
+docker stop datanode2
+
+hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes|Last contact"
+
+hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes|^Name|^Hostname|Last contact"
+
+hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Live_repl|Status|Number of data-nodes|Under-replicated|Missing replicas|Average block replication"
+hdfs dfsadmin -report | grep -i "under replicated"
+hdfs dfs -cat /user/student/lab01/retail_transactions.csv | wc -l
+
+docker start datanode2
+
+hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes"
+hdfs dfsadmin -report | grep -i "under replicated"
+hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Live_repl|Status|Under-replicated|Average block replication"
