@@ -15,3 +15,17 @@ newgrp docker
 
 # Kiểm tra cài đặt
 docker --version && docker compose version
+
+
+mkdir -p ~/ct482 && cd ~/ct482
+unzip -q moi-truong-bigdata-lab.zip
+cd moi-truong-bigdata-lab
+ls -l
+ls src/kiem-tra
+
+docker compose build
+docker images bigdata-lab
+
+docker compose build --build-arg APACHE_MIRROR=https://downloads.apache.org
+# Hoặc sử dụng mirror châu Á:
+docker compose build --build-arg APACHE_MIRROR=https://mirrors.aliyun.com/apache
