@@ -1,32 +1,3 @@
-<?php
-// THAY ĐỔI CÁC THÔNG TIN DƯỚI ĐÂY CHO ĐÚNG VỚI MÁY DATABASE
-$server_name = "IP_DONG_CUA_MAY_DATABASE"; 
-$username = "Hao_B2305569";
-$password = "MatKhauCuaUserDatabase";
-$database = "Hao_B2305569_database";
-
-// Tạo kết nối
-$conn = new mysqli($server_name, $username, $password, $database);
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
-echo "<h1>Kết nối thành công tới Database Server trên OpenStack!</h1>";
-
-// Truy vấn dữ liệu từ bảng todo_list đã tạo ở phần trước
-$sql = "SELECT item_id, content FROM todo_list";
-$result = $conn->query($sql);
-
-if ($result->num_index > 0 || $result->num_rows > 0) {
-    echo "<h3>Danh sách công việc (Todo List):</h3><ul>";
-    while($row = $result->fetch_assoc()) {
-        echo "<li>" . $row["item_id"] . ". " . $row["content"] . "</li>";
-    }
-    echo "</ul>";
-} else {
-    echo "Không có dữ liệu trong bảng.";
-}
-
-$conn->close();
-?>
+sudo apt remove docker docker-engine docker.io containerd runc 2>/dev/null
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
