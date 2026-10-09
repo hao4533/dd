@@ -1,16 +1,14 @@
-time docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/w -w /w bigdata-lab:2026.10 \
-  python3 gen_data.py --rows 5000000 --out ./data
-ls -lh data
+ls -lh /data
+hdfs dfs -mkdir -p /user/student/lab01
+hdfs dfs -put /data/retail_transactions.csv /user/student/lab01/
+hdfs dfs -ls /user/student/lab01
 
-docker compose up -d --wait
-docker compose ps --format 'table {{.Name}}\t{{.Service}}\t{{.Status}}'
+hdfs dfs -ls -h /user/student/lab01
+hdfs dfs -du -h /user/student/lab01
+hdfs dfs -count -h /user/student/lab01
+hdfs dfs -cat /user/student/lab01/retail_transactions.csv | head -n 5
+hdfs dfs -tail /user/student/lab01/retail_transactions.csv | tail -n 3
 
-hadoop version | head -1
-java -version 2>&1 | head -1
-python3 --version
-hdfs dfsadmin -safemode get
-hdfs dfsadmin -report | grep -E 'Live datanodes|^Name:|^Hostname:'
-hdfs dfs -ls /
-
-docker exec -it resourcemanager yarn node -list
-docker exec -it spark-master curl -s localhost:8080/json/ | grep -o '"aliveworkers" : [0-9]*'
+hdfs dfs -get /user/student/lab01/retail_transactions.csv /tmp/retail_check.csv
+md5sum /data/retail_transactions.csv /tmp/retail_check.csv
+rm /tmp/retail_check.csv
