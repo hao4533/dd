@@ -46,3 +46,191 @@ done
 8080   200
 18080  200
 19888  200
+
+root@namenode:~# ls -lh /data
+total 524M
+-rw-r--r-- 1 ubuntu 999  23K Oct  9 15:18 products.csv
+-rw-r--r-- 1 ubuntu 999 387M Oct  9 15:19 retail_transactions.csv
+-rw-r--r-- 1 ubuntu 999  22M Oct  9 15:19 sensor_readings.csv
+-rw-r--r-- 1 ubuntu 999 116M Oct  9 15:19 web_access.log
+root@namenode:~# hdfs dfs -mkdir -p /user/student/lab01
+root@namenode:~# hdfs dfs -put /data/retail_transactions.csv /user/student/lab01/
+root@namenode:~# hdfs dfs -ls /user/student/lab01
+Found 1 items
+-rw-r--r--   2 root supergroup  405181403 2026-10-09 15:54 /user/student/lab01/retail_transactions.csv
+root@namenode:~# hdfs dfs -du -h /user/student/lab01
+386.4 M  772.8 M  /user/student/lab01/retail_transactions.csv
+root@namenode:~# hdfs dfs -count -h /user/student/lab01
+           1            1            386.4 M /user/student/lab01
+root@namenode:~# hdfs dfs -cat /user/student/lab01/retail_transactions.csv | head -n 5
+transaction_id,customer_id,product_id,category,quantity,unit_price,discount,store_id,region,ts
+T0000000000,C0015081,P00343,me_va_be,3,13977000,0,S026,NgheAn,2025-07-14 06:46:58
+T0000000001,C0001229,P00442,gia_dung,5,23031000,0.05,S037,Hanoi,2025-06-28 13:13:12
+T0000000002,C0109496,P00011,gia_dung,2,2897000,0.3,S040,Hanoi,2025-04-23 10:28:38
+T0000000003,C0094858,P00055,thoi_trang,4,10929000,0.1,S026,Hanoi,2025-02-04 05:25:48
+cat: Unable to write to output stream.
+root@namenode:~# hdfs dfs -tail /user/student/lab01/retail_transactions.csv | tail -n 3
+T0004999997,C0003418,P00102,dien_tu,2,5336000,0.2,S005,Hanoi,2025-08-16 20:57:33
+T0004999998,C0025816,P00137,thuc_pham,2,3770000,0.3,S001,HCM,2025-05-17 13:42:50
+T0004999999,C0008469,P00467,thoi_trang,1,24288000,0.2,S022,HCM,2025-07-07 20:41:49
+root@namenode:~# hdfs dfs -get /user/student/lab01/retail_transactions.csv /tmp/retail_check.csv
+root@namenode:~# md5sum /data/retail_transactions.csv /tmp/retail_check.csv
+68c94673ab12df0ee80971c2b2a2c1ba  /data/retail_transactions.csv
+68c94673ab12df0ee80971c2b2a2c1ba  /tmp/retail_check.csv
+root@namenode:~# rm /tmp/retail_check.csv
+root@namenode:~# hdfs dfs -stat "replication=%r blocksize=%o size=%b" /user/student/lab01/retail_transactions.csv
+replication=2 blocksize=134217728 size=405181403
+root@namenode:~# hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations
+Connecting to namenode via http://namenode:9870/fsck?ugi=root&files=1&blocks=1&locations=1&path=%2Fuser%2Fstudent%2Flab01%2Fretail_transactions.csv
+FSCK started by root (auth:SIMPLE) from /172.19.0.2 for path /user/student/lab01/retail_transactions.csv at Fri Oct 09 16:07:02 ICT 2026
+
+/user/student/lab01/retail_transactions.csv 405181403 bytes, replicated: replication=2, 4 block(s):  OK
+0. BP-1043049477-172.19.0.2-1791534065916:blk_1073741825_1001 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+1. BP-1043049477-172.19.0.2-1791534065916:blk_1073741826_1002 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK], DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK]]
+2. BP-1043049477-172.19.0.2-1791534065916:blk_1073741827_1003 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK], DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK]]
+3. BP-1043049477-172.19.0.2-1791534065916:blk_1073741828_1004 len=2528219 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+
+
+Status: HEALTHY
+ Number of data-nodes:	2
+ Number of racks:		1
+ Total dirs:			0
+ Total symlinks:		0
+
+Replicated Blocks:
+ Total size:	405181403 B
+ Total files:	1
+ Total blocks (validated):	4 (avg. block size 101295350 B)
+ Minimally replicated blocks:	4 (100.0 %)
+ Over-replicated blocks:	0 (0.0 %)
+ Under-replicated blocks:	0 (0.0 %)
+ Mis-replicated blocks:		0 (0.0 %)
+ Default replication factor:	2
+ Average block replication:	2.0
+ Missing blocks:		0
+ Corrupt blocks:		0
+ Missing replicas:		0 (0.0 %)
+ Blocks queued for replication:	0
+
+Erasure Coded Block Groups:
+ Total size:	0 B
+ Total files:	0
+ Total block groups (validated):	0
+ Minimally erasure-coded block groups:	0
+ Over-erasure-coded block groups:	0
+ Under-erasure-coded block groups:	0
+ Unsatisfactory placement block groups:	0
+ Average block group size:	0.0
+ Missing block groups:		0
+ Corrupt block groups:		0
+ Missing internal blocks:	0
+ Blocks queued for replication:	0
+FSCK ended at Fri Oct 09 16:07:02 ICT 2026 in 82 milliseconds
+
+
+The filesystem under path '/user/student/lab01/retail_transactions.csv' is HEALTHY
+root@namenode:~# ^C
+root@namenode:~# 
+
+root@namenode:~# hdfs dfs -setrep 3 /user/student/lab01/retail_transactions.csv
+Replication 3 set: /user/student/lab01/retail_transactions.csv
+root@namenode:~# hdfs dfs -ls /user/student/lab01/retail_transactions.csv
+-rw-r--r--   3 root supergroup  405181403 2026-10-09 15:54 /user/student/lab01/retail_transactions.csv
+root@namenode:~# hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Target Replicas|Live_repl|Status|Under-replicated|Missing replicas"
+Connecting to namenode via http://namenode:9870/fsck?ugi=root&files=1&blocks=1&locations=1&path=%2Fuser%2Fstudent%2Flab01%2Fretail_transactions.csv
+/user/student/lab01/retail_transactions.csv 405181403 bytes, replicated: replication=3, 4 block(s):  Under replicated BP-1043049477-172.19.0.2-1791534065916:blk_1073741825_1001. Target Replicas is 3 but found 2 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
+ Under replicated BP-1043049477-172.19.0.2-1791534065916:blk_1073741826_1002. Target Replicas is 3 but found 2 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
+ Under replicated BP-1043049477-172.19.0.2-1791534065916:blk_1073741827_1003. Target Replicas is 3 but found 2 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
+ Under replicated BP-1043049477-172.19.0.2-1791534065916:blk_1073741828_1004. Target Replicas is 3 but found 2 live replica(s), 0 decommissioned replica(s), 0 decommissioning replica(s).
+0. BP-1043049477-172.19.0.2-1791534065916:blk_1073741825_1001 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+1. BP-1043049477-172.19.0.2-1791534065916:blk_1073741826_1002 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK], DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK]]
+2. BP-1043049477-172.19.0.2-1791534065916:blk_1073741827_1003 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK], DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK]]
+3. BP-1043049477-172.19.0.2-1791534065916:blk_1073741828_1004 len=2528219 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+Status: HEALTHY
+ Under-replicated blocks:	4 (100.0 %)
+ Missing replicas:		4 (33.333332 %)
+root@namenode:~# hdfs dfsadmin -report | grep -i "under replicated"
+	Under replicated blocks: 4
+root@namenode:~# 
+
+
+root@namenode:~# hdfs dfs -setrep -w 2 /user/student/lab01/retail_transactions.csv
+Replication 2 set: /user/student/lab01/retail_transactions.csv
+Waiting for /user/student/lab01/retail_transactions.csv ... done
+root@namenode:~# hdfs dfsadmin -report | grep -i "under replicated"
+	Under replicated blocks: 0
+root@namenode:~# 
+
+student@node3:~/B2305569/ct482/moi-truong-bigdata-lab$ sudo docker stop datanode2
+datanode2
+student@node3:~/B2305569/ct482/moi-truong-bigdata-lab$ 
+
+
+root@namenode:~# hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes|Last contact"
+Live datanodes (2):
+Last contact: Fri Oct 09 16:11:16 ICT 2026
+Last contact: Fri Oct 09 16:11:03 ICT 2026
+root@namenode:~# hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes|^Name|^Hostname|Last contact"
+Live datanodes (2):
+Name: 172.19.0.3:9866 (datanode1.bigdata-lab_default)
+Hostname: datanode1
+Last contact: Fri Oct 09 16:11:22 ICT 2026
+Name: 172.19.0.6:9866 (172.19.0.6)
+Hostname: datanode2
+Last contact: Fri Oct 09 16:11:03 ICT 2026
+root@namenode:~# ^C
+root@namenode:~# 
+
+
+root@namenode:~# hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Live_repl|Status|Number of data-nodes|Under-replicated|Missing replicas|Average block replication"
+Connecting to namenode via http://namenode:9870/fsck?ugi=root&files=1&blocks=1&locations=1&path=%2Fuser%2Fstudent%2Flab01%2Fretail_transactions.csv
+0. BP-1043049477-172.19.0.2-1791534065916:blk_1073741825_1001 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+1. BP-1043049477-172.19.0.2-1791534065916:blk_1073741826_1002 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK], DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK]]
+2. BP-1043049477-172.19.0.2-1791534065916:blk_1073741827_1003 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK], DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK]]
+3. BP-1043049477-172.19.0.2-1791534065916:blk_1073741828_1004 len=2528219 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+Status: HEALTHY
+ Number of data-nodes:	2
+ Under-replicated blocks:	0 (0.0 %)
+ Average block replication:	2.0
+ Missing replicas:		0 (0.0 %)
+root@namenode:~# 
+
+
+root@namenode:~# hdfs dfsadmin -report | grep -i "under replicated"
+	Under replicated blocks: 4
+root@namenode:~# hdfs dfs -cat /user/student/lab01/retail_transactions.csv | wc -l
+5000001
+root@namenode:~# 
+
+
+student@node3:~/B2305569/ct482/moi-truong-bigdata-lab$ sudo docker start datanode2
+datanode2
+student@node3:~/B2305569/ct482/moi-truong-bigdata-lab$ 
+
+
+root@namenode:~# hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes"
+Live datanodes (2):
+root@namenode:~# hdfs dfsadmin -report | grep -i "under replicated"
+	Under replicated blocks: 0
+root@namenode:~# hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Live_repl|Status|Under-replicated|Average block replication"
+Connecting to namenode via http://namenode:9870/fsck?ugi=root&files=1&blocks=1&locations=1&path=%2Fuser%2Fstudent%2Flab01%2Fretail_transactions.csv
+0. BP-1043049477-172.19.0.2-1791534065916:blk_1073741825_1001 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+1. BP-1043049477-172.19.0.2-1791534065916:blk_1073741826_1002 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+2. BP-1043049477-172.19.0.2-1791534065916:blk_1073741827_1003 len=134217728 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+3. BP-1043049477-172.19.0.2-1791534065916:blk_1073741828_1004 len=2528219 Live_repl=2  [DatanodeInfoWithStorage[172.19.0.3:9866,DS-52997ab7-c46b-4880-ac07-6e56fcc61535,DISK], DatanodeInfoWithStorage[172.19.0.6:9866,DS-d58f359c-b233-4971-983e-616123ab7dd8,DISK]]
+Status: HEALTHY
+ Under-replicated blocks:	0 (0.0 %)
+ Average block replication:	2.0
+root@namenode:~# 
+
+
+Buoc 16:
+root@namenode:~# cat /data/retail_transactions.csv /data/retail_transactions.csv /data/retail_transactions.csv \
+  | head -c 1073741824 > /tmp/test_1gb.dat
+root@namenode:~# ls -lh /tmp/test_1gb.dat
+-rw-r--r-- 1 root root 1.0G Oct  9 16:20 /tmp/test_1gb.dat
+root@namenode:~# hdfs dfs -mkdir -p /user/student/lab01/bs64 /user/student/lab01/bs128
+root@namenode:~# 
+
+Buoc 17:
+
