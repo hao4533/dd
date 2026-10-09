@@ -1,3 +1,7 @@
+time docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/w -w /w bigdata-lab:2026.10 \
+  python3 gen_data.py --rows 5000000 --out ./data
+ls -lh data
+
 docker compose up -d --wait
 docker compose ps --format 'table {{.Name}}\t{{.Service}}\t{{.Status}}'
 
