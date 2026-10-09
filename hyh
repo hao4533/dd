@@ -1,3 +1,18 @@
+docker compose up -d --wait
+docker compose ps --format 'table {{.Name}}\t{{.Service}}\t{{.Status}}'
+
+docker exec -it namenode bash
+
+hadoop version | head -1
+java -version 2>&1 | head -1
+python3 --version
+hdfs dfsadmin -safemode get
+hdfs dfsadmin -report | grep -E 'Live datanodes|^Name:|^Hostname:'
+hdfs dfs -ls /
+
+docker exec -it resourcemanager yarn node -list
+docker exec -it spark-master curl -s localhost:8080/json/ | grep -o '"aliveworkers" : [0-9]*'
+
 for p in 9870 9864 9865 8088 8042 8043 8080 18080 19888; do
   printf "%-6s %s\n" $p $(curl -s -o /dev/null -w "%{http_code}" -L http://localhost:$p/)
 done
