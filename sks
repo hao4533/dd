@@ -233,4 +233,60 @@ root@namenode:~# hdfs dfs -mkdir -p /user/student/lab01/bs64 /user/student/lab01
 root@namenode:~# 
 
 Buoc 17:
+root@namenode:~# for i in 1 2 3; do
+  hdfs dfs -rm -f -skipTrash /user/student/lab01/bs64/test_1gb.dat > /dev/null
+  echo "== 64 MB, lan $i"
+  time hdfs dfs -D dfs.blocksize=67108864 -put /tmp/test_1gb.dat /user/student/lab01/bs64/test_1gb.dat 
+
+  hdfs dfs -rm -f -skipTrash /user/student/lab01/bs128/test_1gb.dat > /dev/null
+  echo "== 128 MB, lan $i"
+  time hdfs dfs -D dfs.blocksize=134217728 -put /tmp/test_1gb.dat /user/student/lab01/bs128/test_1gb.dat
+done
+== 64 MB, lan 1
+
+real	0m44.025s
+user	0m5.935s
+sys	0m2.698s
+== 128 MB, lan 1
+
+real	0m32.343s
+user	0m5.442s
+sys	0m1.910s
+== 64 MB, lan 2
+
+real	0m36.703s
+user	0m5.061s
+sys	0m2.028s
+== 128 MB, lan 2
+
+real	0m31.755s
+user	0m4.861s
+sys	0m1.830s
+== 64 MB, lan 3
+
+real	0m34.610s
+user	0m4.864s
+sys	0m1.983s
+== 128 MB, lan 3
+
+real	0m34.132s
+user	0m5.231s
+sys	0m1.908s
+root@namenode:~# 
+
+Buoc 18:
+root@namenode:~# for d in bs64 bs128; do
+  hdfs fsck /user/student/lab01/$d/test_1gb.dat -blocks 2>/dev/null | grep "Total blocks"
+  hdfs dfs -stat "%n blocksize=%o" /user/student/lab01/$d/test_1gb.dat
+done
+hdfs dfs -du -h /user/student/lab01
+ Total blocks (validated):	16 (avg. block size 67108864 B)
+test_1gb.dat blocksize=67108864
+ Total blocks (validated):	8 (avg. block size 134217728 B)
+test_1gb.dat blocksize=134217728
+1 G      2 G      /user/student/lab01/bs128
+1 G      2 G      /user/student/lab01/bs64
+386.4 M  772.8 M  /user/student/lab01/retail_transactions.csv
+root@namenode:~# ^C
+root@namenode:~# 
 
