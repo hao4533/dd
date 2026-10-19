@@ -1,5 +1,42 @@
-<img width="1296" height="699" alt="image" src="https://github.com/user-attachments/assets/eb71fa8d-611b-48b1-abe1-53953a5a3bb2" />
-<img width="1296" height="699" alt="image" src="https://github.com/user-attachments/assets/c9ed712c-fc20-4e99-80f0-847e39bd6424" />
-<img width="1296" height="699" alt="image" src="https://github.com/user-attachments/assets/dd7a866f-d39a-4ea6-9379-7c7cfe2b87a1" />
+[menu-huynhanhhao.sh](https://github.com/user-attachments/files/33656276/menu-huynhanhhao.sh)
+#!/bin/bash
 
-<img width="1296" height="699" alt="image" src="https://github.com/user-attachments/assets/848ac49a-a945-49e5-9fdf-cd4793141db1" />
+HOTEN="Huynh Anh Hao"
+EMAIL="haob2305569@student.ctu.edu.vn"
+SDT="0912345678"
+
+while true; do
+    clear
+
+    echo "1. Ho ten"
+    echo "2. Email"
+    echo "3. Dien thoai"
+    echo "4. Ket thuc"
+
+    read -p "Chon (1-4): " chon
+
+    case $chon in
+        1)
+            echo "Ngay gio thuc hien: $(date)"
+            echo "Ho va ten: $HOTEN"
+            read -p "Nhan Enter de tiep tuc..."
+            ;;
+        2)
+            echo "Email: $EMAIL"
+            read -p "Nhan Enter de tiep tuc..."
+            ;;
+        3)
+            echo "In 10 lan so dien thoai:"
+            for (( i=1; i<=10; i++ )); do
+                echo "$i. $SDT"
+            done
+            read -p "Nhan Enter de tiep tuc..."
+            ;;
+        4)
+            echo "Ket thuc chuong trinh."
+            exit 0
+            ;;
+        *)
+            ;;
+    esac
+done
