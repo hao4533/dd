@@ -52,3 +52,21 @@ while true; do
             ;;
     esac
 done
+
+
+#!/bin/bash
+
+# Kiem tra xem co dung 2 tham so dau vao khong ($# la so luong tham so)
+if [ $# -ne 2 ]; then
+    echo "Loi: Ban phai truyen vao dung 2 tham so!"
+    echo "Cu phap: $0 <chuoi_str> <so_nguyen_N>"
+    exit 1
+fi
+
+str=$1
+n=$2
+
+# Vong lap for in chuoi N lan
+for (( i=1; i<=n; i++ )); do
+    echo "$str"
+done
