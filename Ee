@@ -1,91 +1,47 @@
-package vn.edu.bookstore.legacy.adapter.soap;
+package vn.edu.bookstore.legacy.adapter.api;
 
-import java.net.SocketTimeoutException;
 import java.util.List;
+import java.util.regex.Pattern;
 
-import jakarta.xml.ws.WebServiceException;
-import jakarta.xml.ws.soap.SOAPFaultException;
-import jakarta.xml.soap.SOAPFault;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import vn.edu.bookstore.legacy.adapter.soap.generated.BookCatalogFault;
-import vn.edu.bookstore.legacy.adapter.soap.generated.BookCatalogPortType;
-import vn.edu.bookstore.legacy.adapter.soap.generated.ErrorDetail;
-import vn.edu.bookstore.legacy.adapter.soap.generated.GetBookRequest;
-import vn.edu.bookstore.legacy.adapter.soap.generated.SearchBooksRequest;
+import vn.edu.bookstore.legacy.adapter.soap.LegacyCatalogClient;
 
-public class LegacyCatalogClient {
+@RestController
+@RequestMapping("/api/v1/legacy/books")
+public class LegacyBookController {
 
-    private final BookCatalogPortType port;
+    private static final Pattern ISBN13 = Pattern.compile("^(97[89][0-9]{10})$");
 
-    public LegacyCatalogClient(BookCatalogPortType port) {
-        this.port = port;
+    private final LegacyCatalogClient client;
+
+    public LegacyBookController(LegacyCatalogClient client) {
+        this.client = client;
     }
 
-    public LegacyBook getBook(String isbn) {
-        GetBookRequest request = new GetBookRequest();
-        request.setIsbn(isbn);
-        try {
-            return toModel(port.getBook(request).getBook());
-        } catch (BookCatalogFault fault) {
-            throw translate(fault);
-        } catch (SOAPFaultException e) {
-            throw translate(e);
-        } catch (WebServiceException e) {
-            throw unavailable(e);
+    // TH1-6: GET /api/v1/legacy/books/{isbn}
+    @GetMapping("/{isbn}")
+    public BookView getBook(@PathVariable String isbn) {
+        if (!ISBN13.matcher(isbn).matches()) {
+            throw new InvalidRequestException("isbn phải khớp mẫu ^97[89][0-9]{10}$");
         }
+        return BookView.from(client.getBook(isbn));
     }
 
-    public List<LegacyBook> search(String keyword, int maxResults) {
-        SearchBooksRequest request = new SearchBooksRequest();
-        request.setKeyword(keyword);
-        request.setMaxResults(maxResults);
-        try {
-            return port.searchBooks(request).getBook().stream()
-                    .map(LegacyCatalogClient::toModel)
-                    .toList();
-        } catch (BookCatalogFault fault) {
-            throw translate(fault);
-        } catch (SOAPFaultException e) {
-            throw translate(e);
-        } catch (WebServiceException e) {
-            throw unavailable(e);
+    // TH1-6: GET /api/v1/legacy/books?q=micro&limit=10
+    @GetMapping
+    public List<BookView> search(@RequestParam("q") String keyword,
+                                  @RequestParam(name = "limit", defaultValue = "10") int limit) {
+        if (keyword.isBlank() || keyword.trim().length() < 2) {
+            throw new InvalidRequestException("q phải có ít nhất 2 ký tự");
         }
-    }
-
-    /** TH1-7: fault có mô hình (khai báo trong WSDL) - dựa vào mã nghiệp vụ trong bs:ErrorDetail. */
-    static LegacyCatalogException translate(BookCatalogFault fault) {
-        ErrorDetail d = fault.getFaultInfo();
-        String code = d == null ? "UNKNOWN" : d.getCode();
-        String message = d == null ? fault.getMessage() : d.getMessage();
-        Kind kind = switch (code) {
-            case "BOOK_NOT_FOUND" -> Kind.NOT_FOUND;
-            case "INVALID_ISBN", "INVALID_REQUEST" -> Kind.INVALID_REQUEST;
-            default -> Kind.UPSTREAM_ERROR;
-        };
-        return new LegacyCatalogException(kind, code, message, fault);
-    }
-
-    /** TH1-7: fault không có mô hình - chỉ còn faultcode soap:Client / soap:Server. */
-    static LegacyCatalogException translate(SOAPFaultException e) {
-        SOAPFault f = e.getFault();
-        String faultCode = f.getFaultCodeAsQName().getLocalPart();
-        Kind kind = "Client".equals(faultCode) ? Kind.INVALID_REQUEST : Kind.UPSTREAM_ERROR;
-        return new LegacyCatalogException(kind, "soap:" + faultCode, f.getFaultString(), e);
-    }
-
-    static LegacyCatalogException unavailable(WebServiceException e) {
-        boolean timeout = hasCause(e, SocketTimeoutException.class)
-                || hasCause(e, java.net.http.HttpTimeoutException.class);
-        return new LegacyCatalogException(timeout ? Kind.UPSTREAM_TIMEOUT : Kind.UPSTREAM_UNAVAILABLE,
-                null, "Không gọi được BookCatalogService: " + e.getMessage(), e);
-    }
-
-    private static boolean hasCause(Throwable t, Class<? extends Throwable> type) {
-        for (Throwable c = t; c != null; c = c.getCause()) {
-            if (type.isInstance(c)) {
-                return true;
-            }
+        if (limit < 1 || limit > 50) {
+            throw new InvalidRequestException("limit phải trong khoảng 1..50");
         }
-        return false;
+        return client.search(keyword.trim(), limit).stream().map(BookView::from).toList();
     }
 }
