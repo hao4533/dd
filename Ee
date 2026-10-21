@@ -1,6 +1,5 @@
 package vn.edu.bookstore.legacy.adapter.api;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,30 +12,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/** Hệ thống kế thừa chậm: timeout đọc 500 ms nhỏ hơn độ trễ 2 s -> 504. */
-@SpringBootTest(properties = "bookstore.legacy.read-timeout=500ms")
+/** Hệ thống kế thừa tắt (không có ai lắng nghe cổng) -> 503. */
+@SpringBootTest
 @AutoConfigureMockMvc
-class LegacyUnavailableTest {
-
-    static final LegacySoapTestServer SLOW = LegacySoapTestServer.start(2000);
+class LegacyDownTest {
 
     @DynamicPropertySource
     static void props(DynamicPropertyRegistry r) {
-        r.add("bookstore.legacy.endpoint", SLOW::url);
-    }
-
-    @AfterAll
-    static void stop() {
-        SLOW.close();
+        int port = LegacySoapTestServer.freePort();
+        r.add("bookstore.legacy.endpoint", () -> "http://localhost:" + port + "/ws/catalog");
     }
 
     @Autowired
     MockMvc mvc;
 
     @Test
-    void heThongKeThuaChanThanh504() throws Exception {
+    void heThongKeThuaTatThanh503() throws Exception {
         mvc.perform(get("/api/v1/legacy/books/9780134685991"))
-                .andExpect(status().isGatewayTimeout())
+                .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.type").value("https://api.bookstore.edu.vn/problems/upstream-unavailable"));
     }
 }
