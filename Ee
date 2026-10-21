@@ -1,35 +1,28 @@
-package vn.edu.bookstore.legacy.adapter.api;
+package vn.edu.bookstore.legacy.adapter.soap;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import vn.edu.bookstore.legacy.adapter.soap.generated.BookCatalogFault;
+import vn.edu.bookstore.legacy.adapter.soap.generated.ErrorDetail;
 
-/** Hệ thống kế thừa tắt (không có ai lắng nghe cổng) -> 503. */
-@SpringBootTest
-@AutoConfigureMockMvc
-class LegacyDownTest {
+import static org.assertj.core.api.Assertions.assertThat;
 
-    @DynamicPropertySource
-    static void props(DynamicPropertyRegistry r) {
-        int port = LegacySoapTestServer.freePort();
-        r.add("bookstore.legacy.endpoint", () -> "http://localhost:" + port + "/ws/catalog");
+/** Kiểm thử đơn vị cho bảng dịch mã lỗi kế thừa -> loại lỗi nội bộ. */
+class LegacyCatalogClientTranslateTest {
+
+    private static BookCatalogFault fault(String code) {
+        ErrorDetail d = new ErrorDetail();
+        d.setCode(code);
+        d.setMessage("m");
+        return new BookCatalogFault("m", d);
     }
 
-    @Autowired
-    MockMvc mvc;
-
     @Test
-    void heThongKeThuaTatThanh503() throws Exception {
-        mvc.perform(get("/api/v1/legacy/books/9780134685991"))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.type").value("https://api.bookstore.edu.vn/problems/upstream-unavailable"));
+    void bangDichMaLoi() {
+        assertThat(LegacyCatalogClient.translate(fault("BOOK_NOT_FOUND")).kind()).isEqualTo(Kind.NOT_FOUND);
+        assertThat(LegacyCatalogClient.translate(fault("INVALID_ISBN")).kind()).isEqualTo(Kind.INVALID_REQUEST);
+        assertThat(LegacyCatalogClient.translate(fault("INVALID_REQUEST")).kind()).isEqualTo(Kind.INVALID_REQUEST);
+        assertThat(LegacyCatalogClient.translate(fault("BACKEND_ERROR")).kind()).isEqualTo(Kind.UPSTREAM_ERROR);
+        assertThat(LegacyCatalogClient.translate(fault("MA_LA")).kind()).isEqualTo(Kind.UPSTREAM_ERROR);
     }
 }
