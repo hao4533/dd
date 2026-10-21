@@ -45,3 +45,17 @@ curl -s "http://localhost:8091/ws/catalog?wsdl" | head -n 20[span_30](start_span
 
 # Chạy kiểm thử tự động toàn bộ bài Lab trên CI[span_43](start_span)[span_43](end_span)[span_44](start_span)[span_44](end_span)
 ./mvnw -B verify[span_45](start_span)[span_45](end_span)[span_46](start_span)[span_46](end_span)
+
+
+./mvnw -pl legacy-catalog-adapter package -DskipTests
+BOOKSTORE_LEGACY_ENDPOINT=http://localhost:8091/ws/catalog java -jar legacy-catalog-adapter/target/legacy-catalog-adapter-1.0.0-SNAPSHOT.jar
+
+
+# Test lấy sách thành công (200 OK)
+curl -s -w '\nHTTP %{http_code} %{content_type}\n' localhost:8090/api/v1/legacy/books/9780134685991
+
+# Test sách không tồn tại (404 Not Found - Problem Details)
+curl -s -w '\nHTTP %{http_code} %{content_type}\n' localhost:8090/api/v1/legacy/books/9789999999999
+
+# Test tìm kiếm sách
+curl -s -w '\nHTTP %{http_code} %{content_type}\n' "localhost:8090/api/v1/legacy/books?q=micro"
