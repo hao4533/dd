@@ -1,31 +1,25 @@
-sudo apt remove docker docker-engine docker.io containerd runc 2>/dev/null
-sudo apt update
-sudo apt install -y ca-certificates curl gnupg lsb-release
+# Di chuyển vào thư mục starter và khởi tạo Git repository[span_10](start_span)[span_10](end_span)
+cd starter
+git init -b main
+git add .
+git commit -m "TH1: khởi tạo từ starter"
+git checkout -b th1[span_11](start_span)[span_11](end_span)
 
-sudo mkdir -p /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list
+# Cấp quyền thực thi cho Maven wrapper và các script Bash[span_12](start_span)[span_12](end_span)
+chmod +x mvnw scripts/*.sh[span_13](start_span)[span_13](end_span)
 
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# Chạy kịch bản kiểm tra môi trường[span_14](start_span)[span_14](end_span)
+./scripts/kiem_tra_moi_truong.sh[span_15](start_span)[span_15](end_span)
 
-# Cho phép chạy docker không cần sudo
-sudo usermod -aG docker $USER
-newgrp docker
+# Build thử toàn bộ starter (bỏ qua kiểm thử)[span_16](start_span)[span_16](end_span)
+./mvnw -q -DskipTests package[span_17](start_span)[span_17](end_span)
 
-# Kiểm tra cài đặt
-docker --version && docker compose version
+# Kiểm tra các tệp Java được sinh tự động từ XSD và WSDL[span_18](start_span)[span_18](end_span)
+ls -la bookstore-contracts/target/generated-sources/xjc[span_19](start_span)[span_19](end_span)
+ls -la legacy-catalog-adapter/target/generated-sources/wsimport/vn/edu/bookstore/legacy/adapter/soap/generated[span_20](start_span)[span_20](end_span)
 
+# Lưu lại mốc kiểm tra Phần 1[span_21](start_span)[span_21](end_span)
+git commit -am "TH1-1: kiểm tra xong[span_22](start_span)"[span_22](end_span)
 
-mkdir -p ~/ct482 && cd ~/ct482
-unzip -q moi-truong-bigdata-lab.zip
-cd moi-truong-bigdata-lab
-ls -l
-ls src/kiem-tra
-
-docker compose build
-docker images bigdata-lab
-
-docker compose build --build-arg APACHE_MIRROR=https://downloads.apache.org
-# Hoặc sử dụng mirror châu Á:
-docker compose build --build-arg APACHE_MIRROR=https://mirrors.aliyun.com/apache
+# Chạy kiểm thử cho module bookstore-contracts[span_25](start_span)[span_25](end_span)
+./mvnw -pl bookstore-contracts verify[span_26](start_span)[span_26](end_span)
