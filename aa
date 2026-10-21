@@ -23,3 +23,25 @@ git commit -am "TH1-1: kiểm tra xong[span_22](start_span)"[span_22](end_span)
 
 # Chạy kiểm thử cho module bookstore-contracts[span_25](start_span)[span_25](end_span)
 ./mvnw -pl bookstore-contracts verify[span_26](start_span)[span_26](end_span)
+
+
+# Khởi chạy dịch vụ SOAP bằng Docker Container (cổng 8091)[span_27](start_span)[span_27](end_span)
+docker compose -f compose.legacy.yaml up -d --build[span_28](start_span)[span_28](end_span)
+
+# Kiểm tra WSDL của dịch vụ[span_29](start_span)[span_29](end_span)
+curl -s "http://localhost:8091/ws/catalog?wsdl" | head -n 20[span_30](start_span)[span_30](end_span)
+
+# Gọi thử các thông điệp SOAP mẫu[span_31](start_span)[span_31](end_span)
+./scripts/goi_soap.sh GetBook scripts/soap/GetBook.xml[span_32](start_span)[span_32](end_span)
+./scripts/goi_soap.sh GetBook scripts/soap/GetBook-notfound.xml[span_33](start_span)[span_33](end_span)
+./scripts/goi_soap.sh SearchBooks scripts/soap/SearchBooks.xml[span_34](start_span)[span_34](end_span)
+
+
+# Biên dịch và cài đặt lại các module phụ thuộc[span_39](start_span)[span_39](end_span)
+./mvnw -q -DskipTests install[span_40](start_span)[span_40](end_span)
+
+# Chạy ứng dụng legacy-catalog-adapter ở chế độ demo để kiểm tra log[span_41](start_span)[span_41](end_span)
+./mvnw -pl legacy-catalog-adapter spring-boot:run -Dspring-boot.run.profiles=demo[span_42](start_span)[span_42](end_span)
+
+# Chạy kiểm thử tự động toàn bộ bài Lab trên CI[span_43](start_span)[span_43](end_span)[span_44](start_span)[span_44](end_span)
+./mvnw -B verify[span_45](start_span)[span_45](end_span)[span_46](start_span)[span_46](end_span)
