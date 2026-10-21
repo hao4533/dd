@@ -1,41 +1,42 @@
-// TH1-8: các nhánh lỗi
+package vn.edu.bookstore.legacy.adapter.api;
 
-@Test
-void sachKhongTonTaiThanh404BookNotFound() throws Exception {
-    mvc.perform(get("/api/v1/legacy/books/9789999999999"))
-            .andExpect(status().isNotFound())
-            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
-            .andExpect(jsonPath("$.type").value("https://api.bookstore.edu.vn/problems/book-not-found"))
-            .andExpect(jsonPath("$.legacyCode").value("BOOK_NOT_FOUND"))
-            .andExpect(jsonPath("$.instance").value("/api/v1/legacy/books/9789999999999"));
-}
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.servlet.MockMvc;
 
-@Test
-void isbnSaiBiChanTaiAdapter() throws Exception {
-    mvc.perform(get("/api/v1/legacy/books/12345"))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.type").value("https://api.bookstore.edu.vn/problems/validation-failed"));
-}
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Test
-void faultServerThanh502UpstreamUnavailable() throws Exception {
-    mvc.perform(get("/api/v1/legacy/books/9780000000000"))
-            .andExpect(status().isBadGateway())
-            .andExpect(jsonPath("$.type").value("https://api.bookstore.edu.vn/problems/upstream-unavailable"))
-            .andExpect(jsonPath("$.legacyCode").value("BACKEND_ERROR"));
-}
+/** Hệ thống kế thừa chậm: timeout đọc 500 ms nhỏ hơn độ trễ 2 s -> 504. */
+@SpringBootTest(properties = "bookstore.legacy.read-timeout=500ms")
+@AutoConfigureMockMvc
+class LegacyUnavailableTest {
 
-@Test
-void timKiemTheoTuKhoa() throws Exception {
-    mvc.perform(get("/api/v1/legacy/books").param("q", "micro"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(2))
-            .andExpect(jsonPath("$[0].isbn").value("9781492034025"));
-}
+    static final LegacySoapTestServer SLOW = LegacySoapTestServer.start(2000);
 
-@Test
-void tuKhoaQuaNganThanh400() throws Exception {
-    mvc.perform(get("/api/v1/legacy/books").param("q", "a"))
-            .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.type").value("https://api.bookstore.edu.vn/problems/validation-failed"));
+    @DynamicPropertySource
+    static void props(DynamicPropertyRegistry r) {
+        r.add("bookstore.legacy.endpoint", SLOW::url);
+    }
+
+    @AfterAll
+    static void stop() {
+        SLOW.close();
+    }
+
+    @Autowired
+    MockMvc mvc;
+
+    @Test
+    void heThongKeThuaChanThanh504() throws Exception {
+        mvc.perform(get("/api/v1/legacy/books/9780134685991"))
+                .andExpect(status().isGatewayTimeout())
+                .andExpect(jsonPath("$.type").value("https://api.bookstore.edu.vn/problems/upstream-unavailable"));
+    }
 }
