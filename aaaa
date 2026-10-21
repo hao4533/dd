@@ -1,48 +1,46 @@
-hdfs dfs -stat "replication=%r blocksize=%o size=%b" /user/student/lab01/retail_transactions.csv
-hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations
+package vn.edu.bookstore.legacy.adapter.config;
 
-hdfs dfs -setrep 3 /user/student/lab01/retail_transactions.csv
-hdfs dfs -ls /user/student/lab01/retail_transactions.csv
-hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Target Replicas|Live_repl|Status|Under-replicated|Missing replicas"
-hdfs dfsadmin -report | grep -i "under replicated"
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import jakarta.xml.ws.BindingProvider;
+import jakarta.xml.ws.handler.Handler;
 
-hdfs dfs -setrep -w 2 /user/student/lab01/retail_transactions.csv
-hdfs dfsadmin -report | grep -i "under replicated"
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-docker stop datanode2
+import vn.edu.bookstore.legacy.adapter.soap.SoapLoggingHandler;
+import vn.edu.bookstore.legacy.adapter.soap.generated.BookCatalogPortType;
+import vn.edu.bookstore.legacy.adapter.soap.generated.BookCatalogService;
 
-hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes|Last contact"
+@Configuration
+public class LegacySoapClientConfig {
 
-hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes|^Name|^Hostname|Last contact"
+    /** Thuộc tính timeout của Metro (Jakarta XML WS RI), đơn vị mili giây. */
+    static final String CONNECT_TIMEOUT = "com.sun.xml.ws.connect.timeout";
+    static final String REQUEST_TIMEOUT = "com.sun.xml.ws.request.timeout";
 
-hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Live_repl|Status|Number of data-nodes|Under-replicated|Missing replicas|Average block replication"
-hdfs dfsadmin -report | grep -i "under replicated"
-hdfs dfs -cat /user/student/lab01/retail_transactions.csv | wc -l
+    @Bean
+    BookCatalogPortType bookCatalogPort(LegacySoapProperties props) {
+        URL wsdl = LegacySoapClientConfig.class.getResource("/wsdl/BookCatalogService.wsdl");
+        BookCatalogPortType port = new BookCatalogService(wsdl).getBookCatalogPort();
 
-docker start datanode2
+        // TH1-4: Ép kiểu port sang BindingProvider và đặt các tham số vào request context
+        BindingProvider bp = (BindingProvider) port;
+        Map<String, Object> ctx = bp.getRequestContext();
+        ctx.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, props.endpoint());
+        ctx.put(CONNECT_TIMEOUT, (int) props.connectTimeout().toMillis());
+        ctx.put(REQUEST_TIMEOUT, (int) props.readTimeout().toMillis());
 
-hdfs dfsadmin -report | grep -E "Live datanodes|Dead datanodes"
-hdfs dfsadmin -report | grep -i "under replicated"
-hdfs fsck /user/student/lab01/retail_transactions.csv -files -blocks -locations | grep -E "Live_repl|Status|Under-replicated|Average block replication"
+        // TH1-5: Nếu props.logMessages() bật thì thêm SoapLoggingHandler vào handler chain
+        if (props.logMessages()) {
+            @SuppressWarnings("rawtypes")
+            List<Handler> chain = new ArrayList<>(bp.getBinding().getHandlerChain());
+            chain.add(new SoapLoggingHandler());
+            bp.getBinding().setHandlerChain(chain);
+        }
 
-
-cat /data/retail_transactions.csv /data/retail_transactions.csv /data/retail_transactions.csv \
-  | head -c 1073741824 > /tmp/test_1gb.dat
-ls -lh /tmp/test_1gb.dat
-hdfs dfs -mkdir -p /user/student/lab01/bs64 /user/student/lab01/bs128
-
-for i in 1 2 3; do
-  hdfs dfs -rm -f -skipTrash /user/student/lab01/bs64/test_1gb.dat > /dev/null
-  echo "== 64 MB, lan $i"
-  time hdfs dfs -D dfs.blocksize=67108864 -put /tmp/test_1gb.dat /user/student/lab01/bs64/test_1gb.dat
-
-  hdfs dfs -rm -f -skipTrash /user/student/lab01/bs128/test_1gb.dat > /dev/null
-  echo "== 128 MB, lan $i"
-  time hdfs dfs -D dfs.blocksize=134217728 -put /tmp/test_1gb.dat /user/student/lab01/bs128/test_1gb.dat
-done
-
-for d in bs64 bs128; do
-  hdfs fsck /user/student/lab01/$d/test_1gb.dat -blocks 2>/dev/null | grep "Total blocks"
-  hdfs dfs -stat "%n blocksize=%o" /user/student/lab01/$d/test_1gb.dat
-done
-hdfs dfs -du -h /user/student/lab01
+        return port;
+    }
+}
