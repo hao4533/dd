@@ -1,8 +1,4 @@
-b2305569@b2305569-VirtualBox:~/C_HuynhAnhHao$ for f in libB2305569.h giaithua_B2305569.c tongchan_B2305569.c luythua_B2305569.c myapp_B2305569.c makefile; do
-    echo "=================== $f ==================="
-    cat "$f"
-    echo
-done
+2305569@b2305569-VirtualBox:~/C_HuynhAnhHao$ for f in libB2305569.h giaithua_B2305569.c tongchan_B2305569.c luythua_B2305569.c myapp_B2305569.c makefile; do     echo "=================== $f ===================";     cat "$f";     echo; done
 =================== libB2305569.h ===================
 #ifndef LIBB2305569_H
 #define LIBB2305569_H
@@ -59,6 +55,26 @@ int main() {
 }
 
 =================== makefile ===================
-cat: makefile: No such file or directory
+CC     = gcc
+CFLAGS = -Wall -c
+MASV   = B2305569
+LIB    = lib$(MASV).a
+OBJS   = giaithua_$(MASV).o tongchan_$(MASV).o luythua_$(MASV).o
+APP    = myapp_$(MASV)
+
+lib:
+	$(CC) $(CFLAGS) giaithua_$(MASV).c tongchan_$(MASV).c luythua_$(MASV).c
+	ar rcs $(LIB) $(OBJS)
+
+com:
+	$(CC) -o $(APP) $(APP).c -L. -l$(MASV)
+
+run:
+	./$(APP)
+
+clean:
+	rm -f *.o $(LIB) $(APP)
+
+.PHONY: lib com run clean
 
 b2305569@b2305569-VirtualBox:~/C_HuynhAnhHao$ 
