@@ -55,9 +55,9 @@ nano myapp_B2305569.c
 #include "libB2305569.h"
 
 int main() {
-printf("=== BANG KET QUA THUC HANH ===\n");
-printf("1. Giai thừa của 7: %ld\n", giaithua_B2305569(7));
-printf("2. Tổng chẵn từ 1 đến 30: %d\n", tongchan_B2305569(30));
-printf("3. Lũy thừa 3 của 7 (7^3): %ld\n", luythua_B2305569(7, 3));
-return 0;
+    printf("=== BANG KET QUA THUC HANH ===\n");
+    printf("1. Giai thua cua 7: %ld\n", giaithua_B2305569(7));
+    printf("2. Tong chan tu 1 den 30: %d\n", tongchan_B2305569(30));
+    printf("3. Luy thua 3 cua 7 (7^3): %ld\n", luythua_B2305569(7, 3));
+    return 0;
 }
