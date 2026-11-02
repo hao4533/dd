@@ -1,3 +1,9 @@
+for f in libB2305569.h giaithua_B2305569.c tongchan_B2305569.c luythua_B2305569.c myapp_B2305569.c makefile; do
+    echo "=================== $f ==================="
+    cat "$f"
+    echo
+done
+
 mkdir C_HuynhAnhHao
 cd C_HuynhAnhHao
 
