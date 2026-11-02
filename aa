@@ -1,61 +1,64 @@
-# Di chuyển vào thư mục starter và khởi tạo Git repository[span_10](start_span)[span_10](end_span)
-cd starter
-git init -b main
-git add .
-git commit -m "TH1: khởi tạo từ starter"
-git checkout -b th1[span_11](start_span)[span_11](end_span)
+b2305569@b2305569-VirtualBox:~/C_HuynhAnhHao$ for f in libB2305569.h giaithua_B2305569.c tongchan_B2305569.c luythua_B2305569.c myapp_B2305569.c makefile; do
+    echo "=================== $f ==================="
+    cat "$f"
+    echo
+done
+=================== libB2305569.h ===================
+#ifndef LIBB2305569_H
+#define LIBB2305569_H
 
-# Cấp quyền thực thi cho Maven wrapper và các script Bash[span_12](start_span)[span_12](end_span)
-chmod +x mvnw scripts/*.sh[span_13](start_span)[span_13](end_span)
+long giaithua_B2305569(int n);
+int  tongchan_B2305569(int n);
+long luythua_B2305569(int x, int n);
 
-# Chạy kịch bản kiểm tra môi trường[span_14](start_span)[span_14](end_span)
-./scripts/kiem_tra_moi_truong.sh[span_15](start_span)[span_15](end_span)
+#endif
 
-# Build thử toàn bộ starter (bỏ qua kiểm thử)[span_16](start_span)[span_16](end_span)
-./mvnw -q -DskipTests package[span_17](start_span)[span_17](end_span)
+=================== giaithua_B2305569.c ===================
+#include "libB2305569.h"
 
-# Kiểm tra các tệp Java được sinh tự động từ XSD và WSDL[span_18](start_span)[span_18](end_span)
-ls -la bookstore-contracts/target/generated-sources/xjc[span_19](start_span)[span_19](end_span)
-ls -la legacy-catalog-adapter/target/generated-sources/wsimport/vn/edu/bookstore/legacy/adapter/soap/generated[span_20](start_span)[span_20](end_span)
+long giaithua_B2305569(int n)
+{
+    long kq = 1;
+    for (int i = 2; i <= n; i++)
+        kq *= i;
+    return kq;
+}
 
-# Lưu lại mốc kiểm tra Phần 1[span_21](start_span)[span_21](end_span)
-git commit -am "TH1-1: kiểm tra xong[span_22](start_span)"[span_22](end_span)
+=================== tongchan_B2305569.c ===================
+#include "libB2305569.h"
 
-# Chạy kiểm thử cho module bookstore-contracts[span_25](start_span)[span_25](end_span)
-./mvnw -pl bookstore-contracts verify[span_26](start_span)[span_26](end_span)
+int tongchan_B2305569(int n)
+{
+    int tong = 0;
+    for (int i = 2; i <= n; i += 2)
+        tong += i;
+    return tong;
+}
 
+=================== luythua_B2305569.c ===================
+#include "libB2305569.h"
 
-# Khởi chạy dịch vụ SOAP bằng Docker Container (cổng 8091)[span_27](start_span)[span_27](end_span)
-docker compose -f compose.legacy.yaml up -d --build[span_28](start_span)[span_28](end_span)
+long luythua_B2305569(int x, int n)
+{
+    long kq = 1;
+    for (int i = 0; i < n; i++)
+        kq *= x;
+    return kq;
+}
 
-# Kiểm tra WSDL của dịch vụ[span_29](start_span)[span_29](end_span)
-curl -s "http://localhost:8091/ws/catalog?wsdl" | head -n 20[span_30](start_span)[span_30](end_span)
+=================== myapp_B2305569.c ===================
+#include <stdio.h>
+#include "libB2305569.h"
 
-# Gọi thử các thông điệp SOAP mẫu[span_31](start_span)[span_31](end_span)
-./scripts/goi_soap.sh GetBook scripts/soap/GetBook.xml[span_32](start_span)[span_32](end_span)
-./scripts/goi_soap.sh GetBook scripts/soap/GetBook-notfound.xml[span_33](start_span)[span_33](end_span)
-./scripts/goi_soap.sh SearchBooks scripts/soap/SearchBooks.xml[span_34](start_span)[span_34](end_span)
+int main() {
+    printf("=== BANG KET QUA THUC HANH ===\n");
+    printf("1. Giai thua cua 7: %ld\n", giaithua_B2305569(7));
+    printf("2. Tong chan tu 1 den 30: %d\n", tongchan_B2305569(30));
+    printf("3. Luy thua 3 cua 7 (7^3): %ld\n", luythua_B2305569(7, 3));
+    return 0;
+}
 
+=================== makefile ===================
+cat: makefile: No such file or directory
 
-# Biên dịch và cài đặt lại các module phụ thuộc[span_39](start_span)[span_39](end_span)
-./mvnw -q -DskipTests install[span_40](start_span)[span_40](end_span)
-
-# Chạy ứng dụng legacy-catalog-adapter ở chế độ demo để kiểm tra log[span_41](start_span)[span_41](end_span)
-./mvnw -pl legacy-catalog-adapter spring-boot:run -Dspring-boot.run.profiles=demo[span_42](start_span)[span_42](end_span)
-
-# Chạy kiểm thử tự động toàn bộ bài Lab trên CI[span_43](start_span)[span_43](end_span)[span_44](start_span)[span_44](end_span)
-./mvnw -B verify[span_45](start_span)[span_45](end_span)[span_46](start_span)[span_46](end_span)
-
-
-./mvnw -pl legacy-catalog-adapter package -DskipTests
-BOOKSTORE_LEGACY_ENDPOINT=http://localhost:8091/ws/catalog java -jar legacy-catalog-adapter/target/legacy-catalog-adapter-1.0.0-SNAPSHOT.jar
-
-
-# Test lấy sách thành công (200 OK)
-curl -s -w '\nHTTP %{http_code} %{content_type}\n' localhost:8090/api/v1/legacy/books/9780134685991
-
-# Test sách không tồn tại (404 Not Found - Problem Details)
-curl -s -w '\nHTTP %{http_code} %{content_type}\n' localhost:8090/api/v1/legacy/books/9789999999999
-
-# Test tìm kiếm sách
-curl -s -w '\nHTTP %{http_code} %{content_type}\n' "localhost:8090/api/v1/legacy/books?q=micro"
+b2305569@b2305569-VirtualBox:~/C_HuynhAnhHao$ 
