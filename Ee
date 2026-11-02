@@ -1,63 +1,91 @@
-mkdir -p C_HuynhAnhHao
+mkdir C_HuynhAnhHao
 cd C_HuynhAnhHao
 
-nano libB2305569.h
+# ===== FILE 1 =====
+nano giaithua_B2305569.c
+#include "libB2305569.h"
 
+long giaithua_B2305569(int n)
+{
+    long kq = 1;
+    for (int i = 2; i <= n; i++)
+        kq *= i;
+    return kq;
+}
+
+# ===== FILE 2 =====
+nano tongchan_B2305569.c
+#include "libB2305569.h"
+
+int tongchan_B2305569(int n)
+{
+    int tong = 0;
+    for (int i = 2; i <= n; i += 2)
+        tong += i;
+    return tong;
+}
+
+# ===== FILE 3 =====
+nano luythua_B2305569.c
+#include "libB2305569.h"
+
+long luythua_B2305569(int x, int n)
+{
+    long kq = 1;
+    for (int i = 0; i < n; i++)
+        kq *= x;
+    return kq;
+}
+
+# ===== FILE 4 =====
+nano libB2305569.h
 #ifndef LIBB2305569_H
 #define LIBB2305569_H
 
 long giaithua_B2305569(int n);
-int tongchan_B2305569(int n);
+int  tongchan_B2305569(int n);
 long luythua_B2305569(int x, int n);
 
 #endif
 
-nano giaithua_B2305569.c
-
-#include "libB2305569.h"
-
-long giaithua_B2305569(int n) {
-if (n <= 1) return 1;
-long result = 1;
-for (int i = 2; i <= n; i++) {
-result *= i;
-}
-return result;
-}
-
-nano tongchan_B2305569.c
-
-#include "libB2305569.h"
-
-int tongchan_B2305569(int n) {
-int sum = 0;
-for (int i = 2; i <= n; i += 2) {
-sum += i;
-}
-return sum;
-}
-
-nano luythua_B2305569.c
-
-#include "libB2305569.h"
-
-long luythua_B2305569(int x, int n) {
-long result = 1;
-for (int i = 0; i < n; i++) {
-result *= x;
-}
-return result;
-}
-
+# ===== FILE 5 =====
 nano myapp_B2305569.c
-
 #include <stdio.h>
 #include "libB2305569.h"
 
-int main() {
-    printf("=== BANG KET QUA THUC HANH ===\n");
-    printf("1. Giai thua cua 7: %ld\n", giaithua_B2305569(7));
-    printf("2. Tong chan tu 1 den 30: %d\n", tongchan_B2305569(30));
-    printf("3. Luy thua 3 cua 7 (7^3): %ld\n", luythua_B2305569(7, 3));
+int main(void)
+{
+    printf("Giai thua cua 7     = %ld\n", giaithua_B2305569(7));
+    printf("Tong chan den 30    = %d\n", tongchan_B2305569(30));
+    printf("Luy thua 3 cua 7    = %ld\n", luythua_B2305569(7, 3));
     return 0;
 }
+
+# ===== FILE 6 =====
+nano makefile
+CC     = gcc
+CFLAGS = -Wall -c
+MASV   = B2305569
+LIB    = lib$(MASV).a
+OBJS   = giaithua_$(MASV).o tongchan_$(MASV).o luythua_$(MASV).o
+APP    = myapp_$(MASV)
+
+lib:
+	$(CC) $(CFLAGS) giaithua_$(MASV).c tongchan_$(MASV).c luythua_$(MASV).c
+	ar rcs $(LIB) $(OBJS)
+
+com:
+	$(CC) -o $(APP) $(APP).c -L. -l$(MASV)
+
+run:
+	./$(APP)
+
+clean:
+	rm -f *.o $(LIB) $(APP)
+
+.PHONY: lib com run clean
+
+# ===== BIEN DICH VA CHAY =====
+make lib
+make com
+make run
